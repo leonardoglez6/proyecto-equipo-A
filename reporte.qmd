@@ -1,0 +1,183 @@
+---
+title: "Análisis de células individuales — equipo A"
+subtitle: "Proyecto final · Bioinformática y Estadística 3 · LCG 2027-1"
+author: "Leonardo Daniel González López & Yuliana Denisse Sosa Gómez"
+date: today
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-tools: true
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+# El motor se declara explícitamente para que el render no dependa del orden
+# de los bloques: Quarto lo deduce del primero, y si abre con {bash} busca un
+# kernel de Jupyter que el entorno del módulo no instala.
+engine: knitr
+---
+
+## Antes de empezar
+
+::: {.callout-important}
+## Este reporte tiene que correr desde cero
+
+El criterio A2 de la rúbrica —30 % de la nota del equipo— es que otra persona
+pueda clonar el repositorio y correr `quarto render` sin intervención manual.
+Compruébalo **antes de entregar**, y compruébalo en una sesión limpia de R: un
+objeto que quedó en tu memoria de trabajo no existe para quien evalúa.
+:::
+
+### Rutas
+
+Todas las rutas de datos se declaran aquí y en ningún otro lugar del reporte. Si
+tu copia de los datos está en otro sitio, cambia solo este bloque.
+
+```{r}
+#| label: rutas
+RUTA_DATOS <- "/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto-equipo-A.rds"
+```
+
+### Semilla
+
+```{r}
+#| label: semilla
+# Sin esto, cada render da un resultado distinto y el reporte deja de ser
+# reproducible. Varios métodos del módulo son de permutaciones o de
+# inicialización aleatoria: emptyDrops, scrublet, scDblFinder, UMAP.
+#set.seed(20260903)
+set.seed(6)
+```
+
+### Paquetes
+
+```{r}
+#| label: paquetes
+suppressPackageStartupMessages({
+  library(SingleCellExperiment)
+  library(scuttle)
+  library(scater)
+  library(scDblFinder)
+  library(ggplot2)
+  library(Seurat)
+  library(Matrix)
+  library(DropletUtils)
+  library(SoupX)
+  library(scran)
+  # Añade aquí lo que uses. Si no está en envs/renv.lock del curso,
+  # no va a existir en el cluster: comprueba antes de depender de ello.
+})
+```
+
+## 1. De dónde vienen estos datos
+
+::: {.callout-note}
+## Las cuatro preguntas obligatorias
+:::
+
+**¿Cuántos genes y cuántas células?**
+Dentro del dataset se consideraron:
+* 38,606 genes
+* 927,681 células
+
+Esto se comprobó al analizar el objeto de SingleCellExperiment.
+
+**¿Son cuentas crudas o ya están normalizadas?**
+
+Son cuentas crudas, esto lo comprobamos al comparar la matriz de cuentas de nuestro dataset contra la matriz de cuentas redondeada a que no tenga decimales. El análisis indicó que ambas matrices eran iguales, por lo que se componía de una matriz de cuentas crudas (números enteros solamente).
+
+**¿Qué información de lote o de condición trae?**
+
+Al revisar los metadatos de las celulas (columnas), genes (filas) y generales del dataset, no se encontró información acerca del lote o la condición, solamente se encontró que provenía de la tecnología de 10x genomics, que el nombre del proyecto es "manual_5k_pbmc_NGSC3_ch5", ósea que son células mononucleares de sangre periférica, PBMC según sus siglas en inglés y que son datos de solamente un único donante.
+
+Si bien no se encontró información directamente de los metadatos, se indica que el dataset es derivado de la corrida realizada en la sesión 3 de la clase, es por ello que se buscó en el cluster Ken el directorio donde se encontraran los datos utilizados para la sesión 3. Se encontró el directorio en la ruta `/mnt/data/bioinfo3/compartido/10x/datasets/manual_5k_pbmc_NGSC3_ch5_fastqs` donde se encontraba un archivo markdown `PROCEDENCIA.md` el cual nos confirma que se trata de un dataset del mismo nombre y nos muestra información extra como que se utilizó la versión 3.1.0 de Cell Ranger y que los archivos pesaban 16.3 GB.
+
+Con la información anterior se buscó en la página web de 10x genomics en el apartado de "Dataset" los términos *PBMC manual* y conseguimos dar con el dataset del cual provienen los datos que tiene por título **Peripheral blood mononuclear cells (PBMCs) from a healthy donor - Manual (channel 5)**, en el cual se especifica que la condición del único donante es **Saludable** y se menciona que viene de un experimento en el que se prepararon 8 librerías dentro de un mismo chip y este dataset solo contiene el canal 5, por lo que **solo se tiene 1 lote que pertenece al canal 5 del chip del experimento**. Como confirmación de que son los mismos datos que utilizamos, en la pestaña de "Input files" podemos notar que el tamaño de los FASTQs es de 16.3 B como se especificaba en el archivo de `PROCEDENCIA.md` y se menciona que se utilizón Cell Ranger 3.1.0 debajo del título.
+
+**¿Es la matriz `raw` o la `filtered`?** — de esto depende qué pasos de control de
+calidad puedes hacer.
+
+Se considera que la matriz es 'raw'. Esto por diferentes razones:
+* Al tener 927,681 barcodes se considera demasiadas para estar filtrada, pero un número congruente siendo 'raw'. Usualmente, una matriz filtrada tiene unos pocos miles de barcodes.
+* Se observó que el objeto proviene de la ruta 'raw_feature_bc_matrix', confirmando nuestra hipótesis.
+* No se encontraron métricas de QC dentro del objeto.
+
+**¿Qué versión de la anotación de genes se usó?**
+Al analizar la procedencia del dataset, se pudo confirmar que se usó la Referencia Transcriptómica Humana GRCh38, versión 2024-A.
+
+Esta versión está construida por 10x Genomics a partir de Ensembl 109, GENCODE v44 para humanos.
+
+```{r}
+#| label: importar
+#| eval: false
+sce <- readRDS(RUTA_DATOS)
+sce
+```
+
+## 2. Control de calidad
+
+Documenta **qué umbral usaste y por qué**. Un umbral copiado de un tutorial sin
+mirar la distribución de estos datos es exactamente lo que el criterio A1 (35 %)
+penaliza.
+
+```{r}
+#| label: qc
+#| eval: false
+```
+
+## 3. Normalización y selección de genes
+
+```{r}
+#| label: normalizacion
+#| eval: false
+```
+
+## 4. Reducción de dimensionalidad y agrupamiento
+
+```{r}
+#| label: reduccion
+#| eval: false
+```
+
+## 5. Lo que encontraron
+
+Aquí va la interpretación biológica, no la descripción de lo que hizo el código.
+
+## Tabla de decisiones
+
+**Criterio A3 de la rúbrica, 15 %.** Llénala sobre la marcha, no al final: la
+columna que más pesa es la tercera, y reconstruirla de memoria produce
+justificaciones vacías.
+
+| Decisión | Valor elegido | Por qué | Qué se probó antes |
+|---|---|---|---|
+| Umbral de cuentas mínimas | | | |
+| Umbral de genes detectados | | | |
+| Fracción mitocondrial máxima | | | |
+| Número de componentes principales | | | |
+| Resolución de agrupamiento | | | |
+
+## Lo que no funcionó
+
+Un apartado corto y honesto. Qué intentaron que no salió, y qué aprendieron de
+ello. No resta puntos: un proyecto sin callejones sin salida normalmente es un
+proyecto que no exploró.
+
+## Registro de sesión
+
+```{r}
+#| label: sesion
+sessionInfo()
+```
+
+::: {.callout-tip}
+## Por qué este bloque no se borra
+
+`sessionInfo()` es lo que permite que dentro de un año alguien sepa con qué
+versiones corrió esto. Es la diferencia entre un análisis reproducible y uno que
+funcionaba en la máquina de quien lo escribió.
+:::
