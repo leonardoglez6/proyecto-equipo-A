@@ -154,12 +154,19 @@ mirar la distribución de estos datos es exactamente lo que el criterio A1 (35 %
 penaliza.
 
 ### a) Distinguir gotas reales y vacías
+
 Primero, realizamos la curva de rango para observar los datos del experimento. 
+
+```{r}
+knitr::include_graphics(paste0(FIGURAS, "Curva_de_rango.png"))
+```
 
 Dentro de ello, encontramos umbrales de: 
 
-- Codo: 
-- Inflexión: Sin embargo, estos umbrales fijos pueden llegar a filtrar células pequeñas, 
+- Codo: 6978
+- Inflexión: 526
+
+Sin embargo, estos umbrales fijos pueden llegar a filtrar células pequeñas, 
 por lo que decidimos utilizar emptyDrops.
 
 Usar emptyDrops es más conveniente, ya que al ser una prueba estadística que asume como su 
@@ -167,9 +174,9 @@ hipótesis nula que la gota es del perfil ambiental, se estima mejor su contenid
 
 Se probaron dos umbrales de `lower` (número de UMIs que debe tener la gota para considerarse): 
 
-- lower = 100: Se obtuvieron x células. 
+- lower = 100: Se obtuvieron 3999 células. 
 
-- lower = 50 (aumentando interaciones): Se obtuvieron x células. 
+- lower = 50 (aumentando interaciones): Se obtuvieron 4085 células. 
 
 Decidimos quedarnos con el umbral de lower = 50 usando emptyDrops, debido a que el número es 
 similar, y nos ayuda a incluir más posibles células pequeñas con pocos conteos.
