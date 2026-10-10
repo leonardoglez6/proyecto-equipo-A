@@ -13,8 +13,8 @@ bonito, sino que corra en otra máquina sin intervención manual.
 
 | Nombre | Qué hizo |
 |---|---|
-|Leonardo Daniel González López | Copiar plantilla de proyecto, Reglas de Reproducibilidad y Control de Calidad |
-|Yuliana Denisse Sosa Gómez | Leer los datos, las 4 preguntas y Control de calidad |
+|Leonardo Daniel González López | Copiar plantilla de proyecto, Pregunta 1 y 3, y Control de Calidad |
+|Yuliana Denisse Sosa Gómez | Leer los datos, Pregunta 2 y 4, y Control de calidad |
 
 Esta tabla no es burocracia: el criterio B de la rúbrica es una respuesta
 individual dirigida, y saber quién trabajó en qué parte es lo que la hace justa.
@@ -22,7 +22,7 @@ individual dirigida, y saber quién trabajó en qué parte es lo que la hace jus
 ## Cómo reproducir este análisis
 
 ```bash
-git clone <la-url-de-este-repositorio>
+git clone https://github.com/leonardoglez6/proyecto-equipo-A.git
 cd <el-repositorio>
 quarto render reporte.qmd
 ```
@@ -32,7 +32,7 @@ excluye. Declara aquí de dónde salen.
 
 | Dato | Dónde vive | Cómo se obtuvo |
 |---|---|---|
-| Dataset Equipo A | `/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto-equipo-A.rds` | |
+| Dataset Equipo A | `/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto-equipo-A.rds` | [Peripheral blood mononuclear cells (PBMCs) from a healthy donor - Manual (channel 5) from 10X Genomics](https://www.10xgenomics.com/datasets/peripheral-blood-mononuclear-cells-pbm-cs-from-a-healthy-donor-manual-channel-5-3-1-standard-3-1-0) |
 
 ## Estructura
 
