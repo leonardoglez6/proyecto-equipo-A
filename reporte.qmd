@@ -153,20 +153,25 @@ Decidimos quedarnos con el umbral de lower = 50 usando emptyDrops, debido a que 
 
 ### b) Filtrado del ambiente
 
-Se comparó el perfil ambiental de nuestro dataset de los ensayos del umbral de UMIs que debía tener cada gota para pasar el filtrado de EmptyDrops (50 y 100) evaluando los 20 genes con mayor contribución de las cuentas totales del dataset. Se obtuvieron los mismos resultados para ambos umbrales, por lo que se decidió conservar el dataset con el umbral de lower = 50 considerando la decisión por la cual se llegó en el punto anterior.
+Se comparó el perfil ambiental de nuestro dataset de los ensayos del umbral de UMIs que debía tener cada gota para pasar el filtrado de EmptyDrops (50 y 100) evaluando los 20 genes con mayor contribución en el ambiente del dataset. Se obtuvieron los mismos resultados para ambos umbrales, por lo que se decidió conservar el dataset con el umbral de lower = 50 considerando la decisión por la cual se llegó en el punto anterior.
 
 - Genes con mayor contribución: MALAT1, MT-CO1, MT-CO3, RPL13, MT-CO2, EEF1A1, RPS12, MT-ATP6, TPT1, RPL10, RPLP1, B2M, RPS27, RPL32, MT-CYB, RPL41, TMSB4X, RPS14, RPS3A y RPS18
 
 Se realizó la comparación del filtrado de la contaminación ambiental utilizando `SoupX` por medio de un método manual y uno automático.
 
-- Manual: Debido a que nuestro dataset pertenece a un análisis de Células Mononucleares de Sangre Perfiférica (PBMC) investigamos cuál es la composición de células del tejido, y según lo reportado por Zhang, et. al, 2021, se compone mayormente de linfocitos, además de moncitos, células dendríticas y trazas de progenitores eritroides. Es por ello que se utilizó la lista de genes que se encuentra debajo para checar contaminación por genes de hemoglobina y inmunolgobulina. Finalmente con esta metodología se obtuvo una fracción de contaminación de 
+- Manual: Debido a que nuestro dataset pertenece a un análisis de Células Mononucleares de Sangre Perfiférica (PBMC) investigamos cuál es la composición de células del tejido, y según lo reportado por Zhang, et. al, 2021, se compone mayormente de linfocitos, además de moncitos, células dendríticas y trazas de progenitores eritroides. Es por ello que se utilizó la lista de genes que se encuentra debajo para checar contaminación por genes de hemoglobina y inmunolgobulina. Finalmente con esta metodología se obtuvo un **porcentaje de contaminación de 0.039%**.
 
   - Hemoglobina: HBB, HBA1, HBA2.
 
   - Inmunoglobulina: IGKC, IGHG1, IGHA1, JCHAIN
 
+- Automático: El programa `SoupX` contiene una función para estimar de manera automática el perfil ambiental de fondo en nuestro dataset, así que ante la incertidumbre de saber si los genes elegidos son los correctos para estimar el perfil ambiental se utilizó esta función. Se obtuvo un **porcentaje de contaminación de 1%** y la siguiente gráfica, en la cuál el eje X representa los posibles valores de rho, el eje Y la probabilidad de cada valor de rho, la línea negra sólida el promedio de las distribuciones posteriores de todos los pares gen/cluster para estimar rho, la línea punteada una distribución a priori establecida por el programa por default (y que así lo recomienda e manual) y una línea roja que representa el valor más probable de rho el cual coincide con el porcentaje de contaminación que reportamos en 0.01; la distribución de la línea solida se encuentra muy sesgada hacia valores bajos de rho, lo cual es un muy buen indicativo de la contaminación por RNA ambiental de nuestros datos ya que rho es la fracción de cuentas de cada célula que viene del RNA ambiental.
 
-- Automático: 
+Independientemente de la metodología utilizada se obtuvieron resultados muy positivos para la estimación de la contaminación por RNA ambiental de nuestro dataset, lo cual es un indicativo que no se presenta un problema en esta parte del análisis. Finalmente se decidió por utilizar el método automático debido al rigor estadístico con el cual se estimaba el perfil ambiental.
+
+```{r}
+knitr::include_graphics(paste0(FIGURAS, "autoEstCont_rho.png"))
+```
 
 ### c) Filtrado mitocondrial
 
