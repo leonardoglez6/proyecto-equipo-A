@@ -1,0 +1,5 @@
+Estimated global contamination fraction of 0.39%
+Warning message:
+In sparseMatrix(i = out@i[w] + 1, j = out@j[w] + 1, x = out@x[w],  :
+  'giveCsparse' is deprecated; setting repr="T" for you
+  [[ suppressing 4085 column names ‘AAACCCAAGGTAGTAT-1’, ‘AAACCCAAGTAAGAGG-1’, ‘AAACCCACATTCAGGT-1’ ... ]]

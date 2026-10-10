@@ -1,0 +1,9 @@
+No clusters found or supplied, using every cell as its own cluster.
+Extremely high contamination estimated (0.67).  This likely represents a failure in estimating the contamination fraction.  Set forceAccept=TRUE to proceed with this value.
+Estimated global contamination fraction of 66.85%
+Warning messages:
+1: In adjustCounts(soup_channel_50, roundToInt = TRUE, verbose = 0) :
+  Clustering data not found.  Adjusting counts at cell level.  You will almost certainly get better results if you cluster data first.
+2: In sparseMatrix(i = out@i[w] + 1, j = out@j[w] + 1, x = out@x[w],  :
+  'giveCsparse' is deprecated; setting repr="T" for you
+  [[ suppressing 4085 column names ‘AAACCCAAGGTAGTAT-1’, ‘AAACCCAAGTAAGAGG-1’, ‘AAACCCACATTCAGGT-1’ ... ]]

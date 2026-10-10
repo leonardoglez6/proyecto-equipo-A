@@ -1,0 +1,3 @@
+Error in estimateNonExpressingCells(soup_channel_50, nonExpressedGeneList = list(HB = hemoglobina),  : 
+  Invalid cluster specification.  clusters must be a named vector with all column names in the table of counts appearing.
+Execution halted

@@ -1,0 +1,3 @@
+No clusters found or supplied, using every cell as its own cluster.
+Estimated global contamination fraction of 2.74%
+[2026-10-09T17:52:00.037] error: *** JOB 2659 ON node01 CANCELLED AT 2026-10-09T17:52:00 DUE TO TIME LIMIT ***

@@ -1,0 +1,3 @@
+Error in quickCluster(counts(sce_50)) : 
+  could not find function "quickCluster"
+Execution halted

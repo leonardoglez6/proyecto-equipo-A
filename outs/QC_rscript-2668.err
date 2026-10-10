@@ -1,0 +1,7 @@
+Error: unable to find an inherited method for function ‘colData’ for signature ‘x = "dgCMatrix"’
+In addition: Warning message:
+In addPerCellQCMetrics(sce, subsets = list(MT = mitocondriales,  :
+  'addPerCellQCMetrics' is deprecated.
+Use 'scrapper::quickRnaQc.se' instead.
+See help("Deprecated")
+Execution halted

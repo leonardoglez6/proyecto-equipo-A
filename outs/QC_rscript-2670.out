@@ -1,0 +1,65 @@
+Clase del objeto: dgCMatrix 
+Dimensiones: 38606 4085 
+
+Genes mitocondriales encontrados: 0 
+ 
+
+Cuentas totales por célula: 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+     49    7055    8957    9729   11396   60903 
+
+Métricas de porcentaje de genes mitocondriales por célula: 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+      0       0       0       0       0       0 
+null device 
+          1 
+null device 
+          1 
+
+Descarte de células por umbral: 
+          criterio descarta pct_descartado
+1 fijo de tutorial      125            3.1
+2   MAD adaptativo      346            8.5
+
+Desglose por métrica (MAD): 
+           low_lib_size          low_n_features high_subsets_MT_percent 
+                    320                     331                       0 
+ 
+Comparación fijo VS MAD: 
+       MAD
+fijo    FALSE TRUE
+  FALSE  3739  221
+  TRUE      0  125
+
+Genes ribosomales encontrados: 0 
+ 
+
+Métricas de porcentaje de genes ribosomales por célula: 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+      0       0       0       0       0       0 
+null device 
+          1 
+null device 
+          1 
+
+Células con % ribosomal atípicamente alto (MAD, 3 nmads): 0 (0%)
+
+Solapamiento con descarte mitocondrial (MAD): 
+         MAD_mt
+RIBO_alto FALSE TRUE
+    FALSE  3739  346
+
+Dobletes encontrados: 
+
+singlet doublet 
+   3833     252 
+null device 
+          1 
+
+Células descartadas por criterio:
+       doblete
+MAD     FALSE TRUE
+  FALSE  3487  252
+  TRUE    346    0
+
+Antes: 4085 celulas | Después: 3487 

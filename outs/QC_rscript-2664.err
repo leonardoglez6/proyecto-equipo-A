@@ -1,0 +1,7 @@
+1040 genes passed tf-idf cut-off and 316 soup quantile filter.  Taking the top 100.
+Using 778 independent estimates of rho.
+Estimated global rho of 0.01
+Warning message:
+In sparseMatrix(i = out@i[w] + 1, j = out@j[w] + 1, x = out@x[w],  :
+  'giveCsparse' is deprecated; setting repr="T" for you
+  [[ suppressing 4085 column names ‘AAACCCAAGGTAGTAT-1’, ‘AAACCCAAGTAAGAGG-1’, ‘AAACCCACATTCAGGT-1’ ... ]]

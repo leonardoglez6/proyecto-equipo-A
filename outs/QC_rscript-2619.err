@@ -1,0 +1,5 @@
+No clusters found or supplied, using every cell as its own cluster.
+Error in setContaminationFraction(sc, exp(coef(sc$fit)), forceAccept = forceAccept) : 
+  Extremely high contamination estimated (0.67).  This likely represents a failure in estimating the contamination fraction.  Set forceAccept=TRUE to proceed with this value.
+Calls: calculateContaminationFraction -> setContaminationFraction
+Execution halted

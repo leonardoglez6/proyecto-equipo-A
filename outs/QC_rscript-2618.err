@@ -1,0 +1,3 @@
+Error in data.frame(ensembl_id = hemoglobina, symbol_biomart = hb_biomart$external_gene_name[match(hemoglobina,  : 
+  arguments imply differing number of rows: 10, 0
+Execution halted
