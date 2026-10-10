@@ -90,7 +90,7 @@ suppressPackageStartupMessages({
 set.seed(6)
 
 # -------- Cargar datos -------
-sc_data <- readRDS("/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto-equipo-A.rds")
+sce <- readRDS("/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto-equipo-A.rds")
 ```
 
 **1. ¿Son cuentas crudas o ya están normalizadas?**
@@ -103,7 +103,7 @@ iguales, por lo que se componía de una matriz de cuentas crudas (números enter
 # -------- PREGUNTA 1 | Son cuentas crudas? Si hay decimales, no lo son. -------
 cat(" -------- PREGUNTA 1 | Son cuentas crudas? Si hay decimales, no lo son. -------")
 
-if(all(counts(sc_data)@x == round(counts(sc_data)@x, 0))){ #Esta linea de comando compara la matriz de cuentas donde no hay 0s para que no muera por el p>
+if(all(counts(sce)@x == round(counts(sce)@x, 0))){ #Esta linea de comando compara la matriz de cuentas donde no hay 0s para que no muera por el p>
   cat("\n Las cuentas son crudas.\n")
 } else{
   cat("\n Las cuentas son procesadas.\n")
@@ -132,14 +132,14 @@ Se considera que la matriz es 'raw'. Esto por diferentes razones:
 cat("# -------- PREGUNTA 2 | ¿Las células ya están filtradas? --------\n")
 
 # Número de genes y barcodes
-n_genes = nrow(sc_data)
-n_barcodes = ncol(sc_data)
+n_genes = nrow(sce)
+n_barcodes = ncol(sce)
 
 # Revisar si existen métricas de QC por célula (si tiene columnas tendría información nueva)
-tiene_QC <- length(colData(sc_data)) > 0
+tiene_QC <- length(colData(sce)) > 0
 
 # Revisar el origen del objeto
-origen <- metadata(sc_data)$derivado_de
+origen <- metadata(sce)$derivado_de
 # Este nombre es bastante común en datos de 10xGenomics y Cell Ranger
 es_raw <- grepl("raw_feature_bc_matrix", origen, ignore.case = TRUE)
 
@@ -206,9 +206,9 @@ verificar <- function(nombre, genes, celulas, suma, tiene_lote) {
 
 resultados <- verificar(
   "SingleCellExperiment",
-  nrow(sc_data), ncol(sc_data),
-  sum(counts(sc_data)),
-  "lote" %in% colnames(colData(sc_data))
+  nrow(sce), ncol(sce),
+  sum(counts(sce)),
+  "lote" %in% colnames(colData(sce))
 )
 
 cat("\n\n")
@@ -216,17 +216,17 @@ resultados
 
 # Metadatos de las columnas/células
 cat("\n\nA continuación se muestran los metadatos de las células (columnas):\n")
-colData(sc_data)
-int_colData(sc_data)
+colData(sce)
+int_colData(sce)
 
 # Metadatos de las filas/genes
 cat("\n\nA continuación se muestran los metadatos de los genes (filas):\n")
-rowData(sc_data)
+rowData(sce)
 
 # Metadatos
 cat("\n\nA continuación se muestran los metadatos del dataset:\n")
-metadata(sc_data)
-int_metadata(sc_data)
+metadata(sce)
+int_metadata(sce)
 ```
 
 **¿Qué versión de la anotación de genes se usó?**
@@ -238,7 +238,7 @@ Esta versión está construida por 10x Genomics a partir de Ensembl 109, GENCODE
 ```{r}
 # -------- PREGUNTA 4 | ¿Qué versión de la anotación de genes se usó?
 cat("\n -------- PREGUNTA 4 | ¿Qué versión de la anotación de genes se usó?----------\n")
-head(rowData(sc_data))
+head(rowData(sce))
 
 cat("\nNotamos que la anotación proviene de Ensembl\n")
 cat("Buscando en la ruta del dataset, observamos la procedencia de los datos\n")
@@ -249,12 +249,6 @@ inicio <- grep("^## refdata", texto)
 fin <- grep("^## Verificación", texto)
 
 cat(texto[inicio:(fin - 1)], sep = "\n")
-```
-
-```{r}
-#| label: importar
-#| eval: false
-sce <- readRDS(RUTA_DATOS)
 ```
 
 ## 2. Control de calidad
@@ -268,7 +262,19 @@ penaliza.
 Primero, realizamos la curva de rango para observar los datos del experimento. 
 
 ```{r}
-knitr::include_graphics(paste0(FIGURAS, "Curva_de_rango.png"))
+# -------- Crear la curva de rango --------
+totales <- colSums(counts(sce))
+br <- barcodeRanks(counts(sce))
+plot(br$rank[orden_br], br$total[orden_br], log = "xy",
+     xlab = "Rango del código de barras", ylab = "Total de cuentas",
+     main = "Curva de rango", type = "l", lwd = 2)
+abline(h = knee,       col = "aquamarine2",  lty = 2, lwd = 2)
+abline(h = inflection, col = "coral1", lty = 2, lwd = 2)
+legend("bottomleft", bty = "n", lty = 2, lwd = 2,
+       col = c("aquamarine2", "coral1"),
+       legend = c(paste("codo:", knee),
+                  paste("inflexión:", inflection)))
+
 ```
 
 Dentro de ello, encontramos umbrales de: 
@@ -281,6 +287,16 @@ por lo que decidimos utilizar emptyDrops.
 
 Usar emptyDrops es más conveniente, ya que al ser una prueba estadística que asume como su 
 hipótesis nula que la gota es del perfil ambiental, se estima mejor su contenido. 
+
+```{r}
+# -------- Utilizar EmptyDrops --------
+emptyD <- emptyDrops(counts(sce), lower = 50, niters = 10000)
+llamadas_emptyD <- !is.na(emptyD$FDR) & emptyD$FDR <= 0.001
+
+sce_ED <- sce[, llamadas_emptyD]
+cat("\n\nLas dimensiones después del filtrado por emptyDrops utilizando lower = 50 son las siguientes: \n")
+dim(sce_ED)
+```
 
 Se probaron dos umbrales de `lower` (número de UMIs que debe tener la gota para considerarse): 
 
@@ -307,7 +323,7 @@ de un método manual y uno automático.
 
 - Manual: Debido a que nuestro dataset pertenece a un análisis de Células Mononucleares de Sangre 
 Perfiférica (PBMC) investigamos cuál es la composición de células del tejido, y según lo reportado 
-por Zhang, et. al, 2021, se compone mayormente de linfocitos, además de moncitos, células dendríticas 
+por Zhang, et. al, 2021 [https://pmc.ncbi.nlm.nih.gov/articles/PMC7798416/], se compone mayormente de linfocitos, además de moncitos, células dendríticas 
 y trazas de progenitores eritroides. Es por ello que se utilizó la lista de genes que se encuentra debajo 
 para checar contaminación por genes de hemoglobina y inmunolgobulina. Finalmente con esta metodología 
 se obtuvo un **porcentaje de contaminación de 0.039%**.
@@ -327,14 +343,39 @@ coincide con el porcentaje de contaminación que reportamos en 0.01; la distribu
 encuentra muy sesgada hacia valores bajos de rho, lo cual es un muy buen indicativo de la contaminación por 
 RNA ambiental de nuestros datos ya que rho es la fracción de cuentas de cada célula que viene del RNA ambiental.
 
+```{r}
+# ========== Filtrado Ambiental ============
+# Ver perfil del ambiente
+soup_channel <- SoupChannel(tod = counts(sce), toc = counts(sce_ED))
+
+perfil <- soup_channel$soupProfile
+perfil$symbol <- rowData(sce)$Symbol[match(rownames(perfil), rownames(sce))]
+
+# Top 20 con symbol
+cat("\n\nEl perfil del ambiente con límite 50\n")
+head(perfil[order(-perfil$est), ], 20)
+
+# ========== Clustering rápido, requerido por autoEstCont() ==========
+set.seed(6)
+clusters_rapidos <- quickCluster(counts(sce_ED))
+soup_channel <- setClusters(soup_channel, clusters_rapidos)
+
+# ========== Estimación automática de la fracción de contaminación ==========
+set.seed(6)
+soup_channel <- autoEstCont(soup_channel)
+
+# Calcular media para todas las células
+cat("\nLa fracción de contaminación en promedio dentro del dataset es: ", round(mean(soup_channel$metaData$rho), 4), "\n")
+
+# Descontaminar dataset original
+limpio <- adjustCounts(soup_channel, roundToInt = TRUE, verbose = 0)
+```
+
 Independientemente de la metodología utilizada se obtuvieron resultados muy positivos para la estimación de la 
 contaminación por RNA ambiental de nuestro dataset, lo cual es un indicativo que no se presenta un problema en 
 esta parte del análisis. Finalmente se decidió por utilizar el método automático debido al rigor estadístico 
 con el cual se estimaba el perfil ambiental.
 
-```{r}
-knitr::include_graphics(paste0(FIGURAS, "autoEstCont_rho.png"))
-```
 
 ### c) Filtrado mitocondrial y ribosomal
 
@@ -348,11 +389,6 @@ También, se obtuvieron sus métricas del porcentaje de genes mitocondriales por
 mediana de 4.76% y una media de 8.70%, indicando una gran contaminación mitocondrial. 
 
 Las cuentas totales por células rondaron desde 49 hasta 60,903, con una mediana de 8957 y una media de 9729. 
-
-```{r}
-knitr::include_graphics(paste0(FIGURAS, "MT_cuentas_totales.png"))
-knitr::include_graphics(paste0(FIGURAS, "MT_porcentajes.png"))
-```
 
 Para filtrar los genes mitocondriales, se probaron 2 formas:
 
@@ -384,15 +420,7 @@ una media de 19.51%.
 
 Los cuales se pueden observar en la siguiente gráfica:
 
-```{r}
-knitr::include_graphics(paste0(FIGURAS, "RIBO_porcentajes.png"))
-```
-
 También, se pueden comparar la relación entre las células y su porcentaje mitocondrial y ribosomal.
-
-```{r}
-knitr::include_graphics(paste0(FIGURAS, "MT_vs_RIBO.png"))
-```
 
 Podemos concluir que los porcentajes ribosomales se encuentran dentro de los límites normales dentro de una célula, ya que 
 normalmente se encuentran entre los rangos de 15 - 40% [https://kb.10xgenomics.com/s/article/218169723-What-fraction-of-reads-map-to-ribosomal-proteins]. 
@@ -418,10 +446,6 @@ Lo cual identificó a las células de la siguiente forma:
 * 252 doublets (se descartan)
 
 Dentro de la siguiente gráfica, se pueden observar las células singlets y doublets con el umbral indicado:
-
-```{r}
-knitr::include_graphics(paste0(FIGURAS, "dobletes.png"))
-```
 
 ```{r}
 #| label: qc
