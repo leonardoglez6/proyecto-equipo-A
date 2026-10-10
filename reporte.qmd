@@ -336,23 +336,56 @@ con el cual se estimaba el perfil ambiental.
 knitr::include_graphics(paste0(FIGURAS, "autoEstCont_rho.png"))
 ```
 
-### c) Filtrado mitocondrial
+### c) Filtrado mitocondrial y ribosomal
 
+Para realizar el filtrado de los genes mitocondriales, se tuvieron que utilizar los últimos datos tras el filtrado de EmptyDrops y SoupX. Lo cual, al haber perdido las anotaciones, se tuvieron que recuperar para poder utilizar los símbolos de los genes y poder filtrarlos correctamente (de lo contrario, usaría los IDs de Ensembl). 
 
+Al analizar el dataset, se encontraron 13 genes mitocondriales. 
 
+También, se obtuvieron sus métricas del porcentaje de genes mitocondriales por célula. Con lo cual, se obtuvo una mediana de 4.76% y una media de 8.70%, indicando una gran contaminación mitocondrial. 
+
+Las cuentas totales por células rondaron desde 49 hasta 60,903, con una mediana de 8957 y una media de 9729. 
 
 ```{r}
 knitr::include_graphics(paste0(FIGURAS, "MT_cuentas_totales.png"))
 knitr::include_graphics(paste0(FIGURAS, "MT_porcentajes.png"))
 ```
 
+Para filtrar los genes mitocondriales, se probaron 2 formas:
+
+1. Criterio fijo basado en tutoriales estándar. Un porcentaje de lecturas mitocondriales menor al 5% y con un número de genes mayor a 200 mantiene a la célula dentro del análisis.
+
+2. Criterio basado en MAD (Median Absolute Desviations) adaptativo en base a nuestros datos. El cual marca células atípicas cuando se apartan de la mediana más de 3 desviaciones estándar.
+
+Los resultados fueron los siguientes: 
+
+* Con un criterio fijo se descartaban 1951 células lo cual representa un 47.8% del dataset. 
+
+* Mientras que con el criterio de MAD se descartaron 1113 células, que representa un 27.2% del dataset. Las células se descartaron por umbrales basados en nuestros datos, como los de de librería bajo (menos de 3082 cuentas), pocos genes detectados (menos de 1496 genes detectados) y porcentaje mitocondrial alto (mayor a 11.7%). 
+
+Finalmente, se decidió utilizar el filtrado realizado por MAD, debido a que es un filtro que se adapta a nuestros datos, es decir, no es genérico o estándar. Además, el umbral estándar eliminaba muchas de nuestras células (47.8%), demostrando no estar ajustado. Con este análisis, se logró encontrar uno de los mayores artefactos de nuestro dataset, el cual es la alta contaminación mitocondrial. 
+
+Además del filtrado mitocondrial, decidimos observar si sería necesario hacer un filtrado ribosomal. 
+
+Para ello, se analizaron los genes ribosomales, de los cuales se encontraron 86 en nuestro dataset. 
+
+Y se obtuvieron sus métricas del porcentaje de genes ribosomales por célula. Con lo cual, se obtuvo una mediana de 21.41% y una media de 19.51%.
+
+Los cuales se pueden observar en la siguiente gráfica:
+
 ```{r}
 knitr::include_graphics(paste0(FIGURAS, "RIBO_porcentajes.png"))
 ```
 
+También, se pueden comparar la relación entre las células y su porcentaje mitocondrial y ribosomal.
+
 ```{r}
 knitr::include_graphics(paste0(FIGURAS, "MT_vs_RIBO.png"))
 ```
+
+Podemos concluir que los porcentajes ribosomales se encuentran dentro de los límites normales dentro de una célula, ya que normalmente se encuentran entre los rangos de 15 - 40% [https://kb.10xgenomics.com/s/article/218169723-What-fraction-of-reads-map-to-ribosomal-proteins]. Además, no se encontraron valores atípicos fuera de los 3 MADs. Lo que nos llevó a decidir no hacer ningún filtrado por genes ribosomales, ya que no lo consideramos necesario dentro de nuestros datos. 
+
+
 
 
 
