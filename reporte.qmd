@@ -40,6 +40,7 @@ tu copia de los datos está en otro sitio, cambia solo este bloque.
 ```{r}
 #| label: rutas
 RUTA_DATOS <- "/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto-equipo-A.rds"
+FIGURAS <- "figuras/"
 ```
 
 ### Semilla
@@ -49,13 +50,14 @@ RUTA_DATOS <- "/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto
 # Sin esto, cada render da un resultado distinto y el reporte deja de ser
 # reproducible. Varios métodos del módulo son de permutaciones o de
 # inicialización aleatoria: emptyDrops, scrublet, scDblFinder, UMAP.
-#set.seed(20260903)
 set.seed(6)
 ```
 
 ### Paquetes
 
 ```{r}
+lib_extra <- "/mnt/data/bioinfo3/lgonzalez/4.6"
+
 #| label: paquetes
 suppressPackageStartupMessages({
   library(SingleCellExperiment)
@@ -70,6 +72,13 @@ suppressPackageStartupMessages({
   library(scran)
   # Añade aquí lo que uses. Si no está en envs/renv.lock del curso,
   # no va a existir en el cluster: comprueba antes de depender de ello.
+})
+
+# Se necesita cargar otra dirección donde se encuentran librerías necesarias, pero,
+no disponibles en donde se guardan las librerías para el cluster en general
+.libPaths(c(lib_extra, .libPaths()))
+suppressPackageStartupMessages({
+  library(biomaRt)
 })
 ```
 
@@ -152,22 +161,7 @@ Decidimos quedarnos con el umbral de lower = 50 usando emptyDrops, debido a que 
 #| label: qc
 #| eval: false
 ```
-
-## 3. Normalización y selección de genes
-
-```{r}
-#| label: normalizacion
-#| eval: false
-```
-
-## 4. Reducción de dimensionalidad y agrupamiento
-
-```{r}
-#| label: reduccion
-#| eval: false
-```
-
-## 5. Lo que encontraron
+## 3. Lo que encontraron
 
 Aquí va la interpretación biológica, no la descripción de lo que hizo el código.
 
@@ -181,9 +175,10 @@ justificaciones vacías.
 |---|---|---|---|
 | Umbral de cuentas mínimas | | | |
 | Umbral de genes detectados | | | |
+| Porcentaje de contaminación ambiental | | | |
 | Fracción mitocondrial máxima | | | |
-| Número de componentes principales | | | |
-| Resolución de agrupamiento | | | |
+| Fracción ribosomal máxima | | | |
+
 
 ## Lo que no funcionó
 
