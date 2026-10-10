@@ -153,9 +153,26 @@ Decidimos quedarnos con el umbral de lower = 50 usando emptyDrops, debido a que 
 
 ### b) Filtrado del ambiente
 
+Se comparó el perfil ambiental de nuestro dataset de los ensayos del umbral de UMIs que debía tener cada gota para pasar el filtrado de EmptyDrops (50 y 100) evaluando los 20 genes con mayor contribución de las cuentas totales del dataset. Se obtuvieron los mismos resultados para ambos umbrales, por lo que se decidió conservar el dataset con el umbral de lower = 50 considerando la decisión por la cual se llegó en el punto anterior.
+
+- Genes con mayor contribución: MALAT1, MT-CO1, MT-CO3, RPL13, MT-CO2, EEF1A1, RPS12, MT-ATP6, TPT1, RPL10, RPLP1, B2M, RPS27, RPL32, MT-CYB, RPL41, TMSB4X, RPS14, RPS3A y RPS18
+
+Se realizó la comparación del filtrado de la contaminación ambiental utilizando `SoupX` por medio de un método manual y uno automático.
+
+- Manual: Debido a que nuestro dataset pertenece a un análisis de Células Mononucleares de Sangre Perfiférica (PBMC) investigamos cuál es la composición de células del tejido, y según lo reportado por Zhang, et. al, 2021, se compone mayormente de linfocitos, además de moncitos, células dendríticas y trazas de progenitores eritroides. Es por ello que se utilizó la lista de genes que se encuentra debajo para checar contaminación por genes de hemoglobina y inmunolgobulina. Finalmente con esta metodología se obtuvo una fracción de contaminación de 
+
+  - Hemoglobina: HBB, HBA1, HBA2.
+
+  - Inmunoglobulina: IGKC, IGHG1, IGHA1, JCHAIN
+
+
+- Automático: 
+
 ### c) Filtrado mitocondrial
 
+
 ### d) Filtrado de dobletes
+
 
 ```{r}
 #| label: qc
