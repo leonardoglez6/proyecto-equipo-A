@@ -255,7 +255,6 @@ cat(texto[inicio:(fin - 1)], sep = "\n")
 #| label: importar
 #| eval: false
 sce <- readRDS(RUTA_DATOS)
-sce
 ```
 
 ## 2. Control de calidad
@@ -377,9 +376,11 @@ knitr::include_graphics(paste0(FIGURAS, "dobletes.png"))
 #| label: qc
 #| eval: false
 ```
+
 ## 3. Lo que encontraron
 
 Aquí va la interpretación biológica, no la descripción de lo que hizo el código.
+
 
 ## Tabla de decisiones
 
@@ -389,11 +390,12 @@ justificaciones vacías.
 
 | Decisión | Valor elegido | Por qué | Qué se probó antes |
 |---|---|---|---|
-| Umbral de cuentas mínimas | 50 | Se priorizó conservar células pequeñas obteniendo 4085, por lo que se disminuyó el mínimo de cuentas mínimas, sin embargo, se aumentó el número de iteraciones para darle más robustez al resultado. | Se probó con un valor mínimo de 100 obteniendo 3999 células. Para complementar esta desición se probó revisar el perfil ambiental con SoupX para ambos límites y se encontraron los mismos resultados, por lo que se optó por la decisión de un menor límite. |
-| Umbral de genes detectados | | | |
+| Número de UMIs mínimo para considerarse una célula| 50 | Se priorizó conservar células pequeñas obteniendo 4085, por lo que se disminuyó el mínimo de cuentas mínimas, sin embargo, se aumentó el número de iteraciones para darle más robustez al resultado. | Se probó con un valor mínimo de 100 obteniendo 3999 células. Para complementar esta desición se probó revisar el perfil ambiental con SoupX para ambos límites y se encontraron los mismos resultados, por lo que se optó por la decisión de un menor límite. |
+| Umbral de cuentas mínimas | 3082 | Es parte de los resultados obtenidos por perCellQCMetrics en el cual vimos que tenía robustez al evaluar el MAD frente a un valor fijo. Además la mediana de las cuentas es de 8957 y el primer quartil de 7055, por lo cual eliminaría células con muy bajos conteos sin afectar demasiado al dataset. | No se probó nada anterior a esta metodología. |
+| Umbral de genes detectados | 1496 | Es parte de los resultados obtenidos por perCellQCMetrics en el cual vimos que tenía robustez al evaluar el MAD frente a un valor fijo. | No se probó nada anterior a esta metodología. |
 | Porcentaje de contaminación ambiental | 1% | Se utilizó la función del programa SoupX que calcula automáticamente el perfil de RNA ambiental utilizando métodos estadísticos y no se ve sesgado por la decisión tomada de implementar genes manualmente, lo cual se vio reflejado en la gráfica generada de los posibles valores de rho y su sesgo hacia valores muy pequeños. | Se utilizó el método manual de dos maneras distintas. La primer manera consistió en utilizar una lista de genes solamente de Hemoglobina ya que durante las clases vimos que los eritrocitos tenían una tendencia a lisarse fácilmente al extraer tejido sanguíneo, sin embargo con este método se obtuvo un porcentaje de contaminación del 66.85%, por lo que inferimos que la causa fue la elección de genes como se menciona en el manual de clase además que el archivo de error sugería hacer clustering antes de utilizar `SoupX`. La segunda manera en la que se utilizó el método manual fue realizando clústering y utilizando un alista de genes de hemoglobina más corta y también una lista que incluyera los de inmunoglobulina, con este resultado se obtuvo un porcentaje de contaminación del 0.39%, sin embargo, no tiene el rigor estadístico como el método automático. |
-| Fracción mitocondrial máxima | | | |
-| Fracción ribosomal máxima | | | |
+| Fracción mitocondrial máxima | 11.70% | Se utilizó el MAD que es un método que es más robusto que de manera visual, además utilizando el MAD el 27.2%, así no se perdía una cantidad exrema de datos. | Se probó utilizar un valor fijo, sin embargo, este al ser un valor que se elije de manera subjetiva no sostiene mucha robustez, incluso si visualizamos detenidamente la gráfica, al compararlo con el MAD; sin embargo, el punto de inflexión que nos hizo descartar este método contra el MAD, fue que eliminaba practicamente la mitad del dataset (47.8%), dejándonos con pocas células para trabajar (2134). |
+| Fracción ribosomal máxima | 56.36% | Se utilizó la medida del MAD ya que se probó que era un estimador más robusto cuando se analizaron los genes mitocondriales. Además no se descartaron células, con el umbral siendo bastante mayor que la mediana del porcentaje de genes ribosomales por célula y del tercer quartil. | No se probó nada anterior a esta metodología de RNA ribosomal. |
 | Filtrado de dobletes | scDblFinder con umbral 0.37 | Opción precisa, robusta y eficiente. Identificó el umbral automáticamente. | Nada | 
 
 
@@ -408,6 +410,7 @@ No consideramos que este fuera el problema a encontrar en el dataset hasta que p
 Al implementar las medidas alternativas tuvimos problemas con el tiempo en el que corría el job con el Rscript, ya que teníamos puesto un límite de 4 horas en el método manual cambiando los genes y el job no terminó y lo cortó. El problema era que no estabamos haciendo clustering, lo cual agilizaba el tiempo que tomaba en correr.
 
 Si bien presentó un punto de pánico durante el desarrollo del proyecto, se logró buscar soluciones para proseguir a la fase del QC.
+
 
 ## Registro de sesión
 
