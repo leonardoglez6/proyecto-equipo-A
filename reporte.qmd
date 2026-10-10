@@ -97,26 +97,46 @@ Esto se comprobó al analizar el objeto de SingleCellExperiment.
 
 **¿Son cuentas crudas o ya están normalizadas?**
 
-Son cuentas crudas, esto lo comprobamos al comparar la matriz de cuentas de nuestro dataset contra la matriz de cuentas redondeada a que no tenga decimales. El análisis indicó que ambas matrices eran iguales, por lo que se componía de una matriz de cuentas crudas (números enteros solamente).
+Son cuentas crudas, esto lo comprobamos al comparar la matriz de cuentas de nuestro dataset contra 
+la matriz de cuentas redondeada a que no tenga decimales. El análisis indicó que ambas matrices eran 
+iguales, por lo que se componía de una matriz de cuentas crudas (números enteros solamente).
 
 **¿Qué información de lote o de condición trae?**
 
-Al revisar los metadatos de las celulas (columnas), genes (filas) y generales del dataset, no se encontró información acerca del lote o la condición, solamente se encontró que provenía de la tecnología de 10x genomics, que el nombre del proyecto es "manual_5k_pbmc_NGSC3_ch5", ósea que son células mononucleares de sangre periférica, PBMC según sus siglas en inglés y que son datos de solamente un único donante.
+Al revisar los metadatos de las celulas (columnas), genes (filas) y generales del dataset, no se encontró 
+información acerca del lote o la condición, solamente se encontró que provenía de la tecnología de 10x 
+genomics, que el nombre del proyecto es "manual_5k_pbmc_NGSC3_ch5", ósea que son células mononucleares 
+de sangre periférica, PBMC según sus siglas en inglés y que son datos de solamente un único donante.
 
-Si bien no se encontró información directamente de los metadatos, se indica que el dataset es derivado de la corrida realizada en la sesión 3 de la clase, es por ello que se buscó en el cluster Ken el directorio donde se encontraran los datos utilizados para la sesión 3. Se encontró el directorio en la ruta `/mnt/data/bioinfo3/compartido/10x/datasets/manual_5k_pbmc_NGSC3_ch5_fastqs` donde se encontraba un archivo markdown `PROCEDENCIA.md` el cual nos confirma que se trata de un dataset del mismo nombre y nos muestra información extra como que se utilizó la versión 3.1.0 de Cell Ranger y que los archivos pesaban 16.3 GB.
+Si bien no se encontró información directamente de los metadatos, se indica que el dataset es derivado 
+de la corrida realizada en la sesión 3 de la clase, es por ello que se buscó en el cluster Ken el directorio 
+donde se encontraran los datos utilizados para la sesión 3. Se encontró el directorio en la ruta 
+`/mnt/data/bioinfo3/compartido/10x/datasets/manual_5k_pbmc_NGSC3_ch5_fastqs` donde se encontraba un archivo markdown 
+`PROCEDENCIA.md` el cual nos confirma que se trata de un dataset del mismo nombre y nos muestra información 
+extra como que se utilizó la versión 3.1.0 de Cell Ranger y que los archivos pesaban 16.3 GB.
 
-Con la información anterior se buscó en la página web de 10x genomics en el apartado de "Dataset" los términos *PBMC manual* y conseguimos dar con el dataset del cual provienen los datos que tiene por título **Peripheral blood mononuclear cells (PBMCs) from a healthy donor - Manual (channel 5)**, en el cual se especifica que la condición del único donante es **Saludable** y se menciona que viene de un experimento en el que se prepararon 8 librerías dentro de un mismo chip y este dataset solo contiene el canal 5, por lo que **solo se tiene 1 lote que pertenece al canal 5 del chip del experimento**. Como confirmación de que son los mismos datos que utilizamos, en la pestaña de "Input files" podemos notar que el tamaño de los FASTQs es de 16.3 B como se especificaba en el archivo de `PROCEDENCIA.md` y se menciona que se utilizón Cell Ranger 3.1.0 debajo del título.
+Con la información anterior se buscó en la página web de 10x genomics en el apartado de "Dataset" los 
+términos *PBMC manual* y conseguimos dar con el dataset del cual provienen los datos que tiene por título 
+**Peripheral blood mononuclear cells (PBMCs) from a healthy donor - Manual (channel 5)**, en el cual se 
+especifica que la condición del único donante es **Saludable** y se menciona que viene de un experimento 
+en el que se prepararon 8 librerías dentro de un mismo chip y este dataset solo contiene el canal 5, por 
+lo que **solo se tiene 1 lote que pertenece al canal 5 del chip del experimento**. Como confirmación de 
+que son los mismos datos que utilizamos, en la pestaña de "Input files" podemos notar que el tamaño de 
+los FASTQs es de 16.3 B como se especificaba en el archivo de `PROCEDENCIA.md` y se menciona que se utilizaronn 
+Cell Ranger 3.1.0 debajo del título.
 
 **¿Es la matriz `raw` o la `filtered`?** — de esto depende qué pasos de control de
 calidad puedes hacer.
 
 Se considera que la matriz es 'raw'. Esto por diferentes razones:
-* Al tener 927,681 barcodes se considera demasiadas para estar filtrada, pero un número congruente siendo 'raw'. Usualmente, una matriz filtrada tiene unos pocos miles de barcodes.
+* Al tener 927,681 barcodes se considera demasiadas para estar filtrada, pero un número congruente siendo 
+'raw'. Usualmente, una matriz filtrada tiene unos pocos miles de barcodes.
 * Se observó que el objeto proviene de la ruta 'raw_feature_bc_matrix', confirmando nuestra hipótesis.
 * No se encontraron métricas de QC dentro del objeto.
 
 **¿Qué versión de la anotación de genes se usó?**
-Al analizar la procedencia del dataset, se pudo confirmar que se usó la Referencia Transcriptómica Humana GRCh38, versión 2024-A.
+Al analizar la procedencia del dataset, se pudo confirmar que se usó la Referencia Transcriptómica 
+Humana GRCh38, versión 2024-A.
 
 Esta versión está construida por 10x Genomics a partir de Ensembl 109, GENCODE v44 para humanos.
 
@@ -139,9 +159,11 @@ Primero, realizamos la curva de rango para observar los datos del experimento.
 Dentro de ello, encontramos umbrales de: 
 
 - Codo: 
-- Inflexión: Sin embargo, estos umbrales fijos pueden llegar a filtrar células pequeñas, por lo que decidimos utilizar emptyDrops.
+- Inflexión: Sin embargo, estos umbrales fijos pueden llegar a filtrar células pequeñas, 
+por lo que decidimos utilizar emptyDrops.
 
-Usar emptyDrops es más conveniente, ya que al ser una prueba estadística que asume como su hipótesis nula que la gota es del perfil ambiental, se estima mejor su contenido. 
+Usar emptyDrops es más conveniente, ya que al ser una prueba estadística que asume como su 
+hipótesis nula que la gota es del perfil ambiental, se estima mejor su contenido. 
 
 Se probaron dos umbrales de `lower` (número de UMIs que debe tener la gota para considerarse): 
 
@@ -149,25 +171,49 @@ Se probaron dos umbrales de `lower` (número de UMIs que debe tener la gota para
 
 - lower = 50 (aumentando interaciones): Se obtuvieron x células. 
 
-Decidimos quedarnos con el umbral de lower = 50 usando emptyDrops, debido a que el número es similar, y nos ayuda a incluir más posibles células pequeñas con pocos conteos.
+Decidimos quedarnos con el umbral de lower = 50 usando emptyDrops, debido a que el número es 
+similar, y nos ayuda a incluir más posibles células pequeñas con pocos conteos.
 
 ### b) Filtrado del ambiente
 
-Se comparó el perfil ambiental de nuestro dataset de los ensayos del umbral de UMIs que debía tener cada gota para pasar el filtrado de EmptyDrops (50 y 100) evaluando los 20 genes con mayor contribución en el ambiente del dataset. Se obtuvieron los mismos resultados para ambos umbrales, por lo que se decidió conservar el dataset con el umbral de lower = 50 considerando la decisión por la cual se llegó en el punto anterior.
+Se comparó el perfil ambiental de nuestro dataset de los ensayos del umbral de UMIs que debía 
+tener cada gota para pasar el filtrado de EmptyDrops (50 y 100) evaluando los 20 genes con mayor 
+contribución en el ambiente del dataset. Se obtuvieron los mismos resultados para ambos umbrales, 
+por lo que se decidió conservar el dataset con el umbral de lower = 50 considerando la decisión 
+por la cual se llegó en el punto anterior.
 
-- Genes con mayor contribución: MALAT1, MT-CO1, MT-CO3, RPL13, MT-CO2, EEF1A1, RPS12, MT-ATP6, TPT1, RPL10, RPLP1, B2M, RPS27, RPL32, MT-CYB, RPL41, TMSB4X, RPS14, RPS3A y RPS18
+- Genes con mayor contribución: MALAT1, MT-CO1, MT-CO3, RPL13, MT-CO2, EEF1A1, RPS12, MT-ATP6, 
+TPT1, RPL10, RPLP1, B2M, RPS27, RPL32, MT-CYB, RPL41, TMSB4X, RPS14, RPS3A y RPS18
 
-Se realizó la comparación del filtrado de la contaminación ambiental utilizando `SoupX` por medio de un método manual y uno automático.
+Se realizó la comparación del filtrado de la contaminación ambiental utilizando `SoupX` por medio 
+de un método manual y uno automático.
 
-- Manual: Debido a que nuestro dataset pertenece a un análisis de Células Mononucleares de Sangre Perfiférica (PBMC) investigamos cuál es la composición de células del tejido, y según lo reportado por Zhang, et. al, 2021, se compone mayormente de linfocitos, además de moncitos, células dendríticas y trazas de progenitores eritroides. Es por ello que se utilizó la lista de genes que se encuentra debajo para checar contaminación por genes de hemoglobina y inmunolgobulina. Finalmente con esta metodología se obtuvo un **porcentaje de contaminación de 0.039%**.
+- Manual: Debido a que nuestro dataset pertenece a un análisis de Células Mononucleares de Sangre 
+Perfiférica (PBMC) investigamos cuál es la composición de células del tejido, y según lo reportado 
+por Zhang, et. al, 2021, se compone mayormente de linfocitos, además de moncitos, células dendríticas 
+y trazas de progenitores eritroides. Es por ello que se utilizó la lista de genes que se encuentra debajo 
+para checar contaminación por genes de hemoglobina y inmunolgobulina. Finalmente con esta metodología 
+se obtuvo un **porcentaje de contaminación de 0.039%**.
 
   - Hemoglobina: HBB, HBA1, HBA2.
 
   - Inmunoglobulina: IGKC, IGHG1, IGHA1, JCHAIN
 
-- Automático: El programa `SoupX` contiene una función para estimar de manera automática el perfil ambiental de fondo en nuestro dataset, así que ante la incertidumbre de saber si los genes elegidos son los correctos para estimar el perfil ambiental se utilizó esta función. Se obtuvo un **porcentaje de contaminación de 1%** y la siguiente gráfica, en la cuál el eje X representa los posibles valores de rho, el eje Y la probabilidad de cada valor de rho, la línea negra sólida el promedio de las distribuciones posteriores de todos los pares gen/cluster para estimar rho, la línea punteada una distribución a priori establecida por el programa por default (y que así lo recomienda e manual) y una línea roja que representa el valor más probable de rho el cual coincide con el porcentaje de contaminación que reportamos en 0.01; la distribución de la línea solida se encuentra muy sesgada hacia valores bajos de rho, lo cual es un muy buen indicativo de la contaminación por RNA ambiental de nuestros datos ya que rho es la fracción de cuentas de cada célula que viene del RNA ambiental.
+- Automático: El programa `SoupX` contiene una función para estimar de manera automática el perfil ambiental 
+de fondo en nuestro dataset, así que ante la incertidumbre de saber si los genes elegidos son los correctos 
+para estimar el perfil ambiental se utilizó esta función. Se obtuvo un **porcentaje de contaminación de 1%** 
+y la siguiente gráfica, en la cuál el eje X representa los posibles valores de rho, el eje Y la probabilidad 
+de cada valor de rho, la línea negra sólida el promedio de las distribuciones posteriores de todos los pares 
+gen/cluster para estimar rho, la línea punteada una distribución a priori establecida por el programa por 
+default (y que así lo recomienda e manual) y una línea roja que representa el valor más probable de rho el cual 
+coincide con el porcentaje de contaminación que reportamos en 0.01; la distribución de la línea solida se 
+encuentra muy sesgada hacia valores bajos de rho, lo cual es un muy buen indicativo de la contaminación por 
+RNA ambiental de nuestros datos ya que rho es la fracción de cuentas de cada célula que viene del RNA ambiental.
 
-Independientemente de la metodología utilizada se obtuvieron resultados muy positivos para la estimación de la contaminación por RNA ambiental de nuestro dataset, lo cual es un indicativo que no se presenta un problema en esta parte del análisis. Finalmente se decidió por utilizar el método automático debido al rigor estadístico con el cual se estimaba el perfil ambiental.
+Independientemente de la metodología utilizada se obtuvieron resultados muy positivos para la estimación de la 
+contaminación por RNA ambiental de nuestro dataset, lo cual es un indicativo que no se presenta un problema en 
+esta parte del análisis. Finalmente se decidió por utilizar el método automático debido al rigor estadístico 
+con el cual se estimaba el perfil ambiental.
 
 ```{r}
 knitr::include_graphics(paste0(FIGURAS, "autoEstCont_rho.png"))
