@@ -356,13 +356,22 @@ knitr::include_graphics(paste0(FIGURAS, "MT_vs_RIBO.png"))
 ```
 
 
-```{r}
-knitr::include_graphics(paste0(FIGURAS, "dobletes.png"))
-```
-
 
 ### d) Filtrado de dobletes
 
+Para filtrar las gotas que tienen dos células, se utilizó la función scDblFinder de Bioconductor. Se decidió utilizar este programa porque se considera una opción más precisa, robusta y eficiente comparada a otras alternativas como DoubletFinder (Germain, P. et al, 2022). Utiliza un algoritmo que simula dobletes al tomar pares de células y sumar sus perfiles de expresión, con lo cual puede calcular características de dobletes artificiales y usarlos para distinguir los simulados y reales. El score es la probabilidad estimada de que la célula sea un doblete, y se escoge de forma automática para minimizar el error de clasificación. 
+
+El programa identificó un umbral con un score de 0.37 para clasificar las células. 
+
+Lo cual identificó a las células de la siguiente forma:
+* 3833 singlets
+* 252 doublets (se descartan)
+
+Dentro de la siguiente gráfica, se pueden observar las células singlets y doublets con el umbral indicado:
+
+```{r}
+knitr::include_graphics(paste0(FIGURAS, "dobletes.png"))
+```
 
 ```{r}
 #| label: qc
@@ -385,6 +394,7 @@ justificaciones vacías.
 | Porcentaje de contaminación ambiental | 1% | Se utilizó la función del programa SoupX que calcula automáticamente el perfil de RNA ambiental utilizando métodos estadísticos y no se ve sesgado por la decisión tomada de implementar genes manualmente, lo cual se vio reflejado en la gráfica generada de los posibles valores de rho y su sesgo hacia valores muy pequeños. | Se utilizó el método manual de dos maneras distintas. La primer manera consistió en utilizar una lista de genes solamente de Hemoglobina ya que durante las clases vimos que los eritrocitos tenían una tendencia a lisarse fácilmente al extraer tejido sanguíneo, sin embargo con este método se obtuvo un porcentaje de contaminación del 66.85%, por lo que inferimos que la causa fue la elección de genes como se menciona en el manual de clase además que el archivo de error sugería hacer clustering antes de utilizar `SoupX`. La segunda manera en la que se utilizó el método manual fue realizando clústering y utilizando un alista de genes de hemoglobina más corta y también una lista que incluyera los de inmunoglobulina, con este resultado se obtuvo un porcentaje de contaminación del 0.39%, sin embargo, no tiene el rigor estadístico como el método automático. |
 | Fracción mitocondrial máxima | | | |
 | Fracción ribosomal máxima | | | |
+| Filtrado de dobletes | scDblFinder con umbral 0.37 | Opción precisa, robusta y eficiente. Identificó el umbral automáticamente. | Nada | 
 
 
 ## Lo que no funcionó
