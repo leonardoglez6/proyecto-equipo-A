@@ -47,9 +47,6 @@ FIGURAS <- "figuras/"
 
 ```{r}
 #| label: semilla
-# Sin esto, cada render da un resultado distinto y el reporte deja de ser
-# reproducible. Varios métodos del módulo son de permutaciones o de
-# inicialización aleatoria: emptyDrops, scrublet, scDblFinder, UMAP.
 set.seed(6)
 ```
 
@@ -88,18 +85,91 @@ suppressPackageStartupMessages({
 ## Las cuatro preguntas obligatorias
 :::
 
-**¿Cuántos genes y cuántas células?**
+```{r}
+#| label: 4 Preguntas
+set.seed(6)
+
+# -------- Cargar datos -------
+sc_data <- readRDS("/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto-equipo-A.rds")
+```
+
+**1. ¿Son cuentas crudas o ya están normalizadas?**
+
+Son cuentas crudas, esto lo comprobamos al comparar la matriz de cuentas de nuestro dataset contra 
+la matriz de cuentas redondeada a que no tenga decimales. El análisis indicó que ambas matrices eran 
+iguales, por lo que se componía de una matriz de cuentas crudas (números enteros solamente).
+
+```{r}
+# -------- PREGUNTA 1 | Son cuentas crudas? Si hay decimales, no lo son. -------
+cat(" -------- PREGUNTA 1 | Son cuentas crudas? Si hay decimales, no lo son. -------")
+
+if(all(counts(sc_data)@x == round(counts(sc_data)@x, 0))){ #Esta linea de comando compara la matriz de cuentas donde no hay 0s para que no muera por el p>
+  cat("\n Las cuentas son crudas.\n")
+} else{
+  cat("\n Las cuentas son procesadas.\n")
+}
+```
+
+**2.1. ¿Cuántos genes y cuántas células?**
 Dentro del dataset se consideraron:
 * 38,606 genes
 * 927,681 células
 
 Esto se comprobó al analizar el objeto de SingleCellExperiment.
 
-**¿Son cuentas crudas o ya están normalizadas?**
+**2.2. ¿Es la matriz `raw` o la `filtered`?** — de esto depende qué pasos de control de
+calidad puedes hacer.
 
-Son cuentas crudas, esto lo comprobamos al comparar la matriz de cuentas de nuestro dataset contra 
-la matriz de cuentas redondeada a que no tenga decimales. El análisis indicó que ambas matrices eran 
-iguales, por lo que se componía de una matriz de cuentas crudas (números enteros solamente).
+Se considera que la matriz es 'raw'. Esto por diferentes razones:
+* Al tener 927,681 barcodes se considera demasiadas para estar filtrada, pero un número congruente siendo 
+'raw'. Usualmente, una matriz filtrada tiene unos pocos miles de barcodes.
+* Se observó que el objeto proviene de la ruta 'raw_feature_bc_matrix', confirmando nuestra hipótesis.
+* No se encontraron métricas de QC dentro del objeto.
+
+
+```{r}
+# -------- PREGUNTA 2 | ¿Las células ya están filtradas? --------
+cat("# -------- PREGUNTA 2 | ¿Las células ya están filtradas? --------\n")
+
+# Número de genes y barcodes
+n_genes = nrow(sc_data)
+n_barcodes = ncol(sc_data)
+
+# Revisar si existen métricas de QC por célula (si tiene columnas tendría información nueva)
+tiene_QC <- length(colData(sc_data)) > 0
+
+# Revisar el origen del objeto
+origen <- metadata(sc_data)$derivado_de
+# Este nombre es bastante común en datos de 10xGenomics y Cell Ranger
+es_raw <- grepl("raw_feature_bc_matrix", origen, ignore.case = TRUE)
+
+# Evaluación manual
+cat("Número de genes:", n_genes, "\n")
+cat("Número de barcodes:", n_barcodes, "\n")
+cat("¿Tiene métricas de QC por célula?:", tiene_QC, "\n")
+cat("Origen:", origen, "\n\n")
+
+# Evaluar con código
+# Se asume que es raro que un dataset filtrado tenga más de unos pocos miles de barcodes
+if (es_raw && n_barcodes > 100000) {
+        cat("Conclusión: Las células NO parecen estar filtradas.\n")
+        cat("- El objeto contiene", n_barcodes, "barcodes.\n")
+        cat("- El objeto viene de 'raw_feature_bc_matrix'.\n")
+  
+  # Existen métricas de calidad generadas?
+  if (!tiene_QC) {
+        cat("- No contiene métricas de QC..\n")
+  }
+  
+  # Si no se puede confirmar, se debería reportar para preguntar a personas correspondientes
+} else if (n_barcodes > 100000) {
+        cat("Conclusión: Las células probablemente NO están filtradas.\n")
+        cat("- El número de barcodes es muy elevado:", n_barcodes, "\n")
+} else {
+        cat("Conclusión: No se puede determinar solamente con estas lecturas.\n")
+}
+cat("\n\n")
+```
 
 **¿Qué información de lote o de condición trae?**
 
@@ -125,20 +195,61 @@ que son los mismos datos que utilizamos, en la pestaña de "Input files" podemos
 los FASTQs es de 16.3 B como se especificaba en el archivo de `PROCEDENCIA.md` y se menciona que se utilizaronn 
 Cell Ranger 3.1.0 debajo del título.
 
-**¿Es la matriz `raw` o la `filtered`?** — de esto depende qué pasos de control de
-calidad puedes hacer.
+```{r}
+# -------- PREGUNTA 3 | ¿Dónde están los metadatos de lote, donante y condición? --------
+cat("# -------- PREGUNTA 3 | ¿Dónde están los metadatos de lote, donante y condición? --------")
 
-Se considera que la matriz es 'raw'. Esto por diferentes razones:
-* Al tener 927,681 barcodes se considera demasiadas para estar filtrada, pero un número congruente siendo 
-'raw'. Usualmente, una matriz filtrada tiene unos pocos miles de barcodes.
-* Se observó que el objeto proviene de la ruta 'raw_feature_bc_matrix', confirmando nuestra hipótesis.
-* No se encontraron métricas de QC dentro del objeto.
+verificar <- function(nombre, genes, celulas, suma, tiene_lote) {
+  data.frame(objeto = nombre, genes = genes, celulas = celulas,
+             suma = suma, lote = tiene_lote)
+}
+
+resultados <- verificar(
+  "SingleCellExperiment",
+  nrow(sc_data), ncol(sc_data),
+  sum(counts(sc_data)),
+  "lote" %in% colnames(colData(sc_data))
+)
+
+cat("\n\n")
+resultados
+
+# Metadatos de las columnas/células
+cat("\n\nA continuación se muestran los metadatos de las células (columnas):\n")
+colData(sc_data)
+int_colData(sc_data)
+
+# Metadatos de las filas/genes
+cat("\n\nA continuación se muestran los metadatos de los genes (filas):\n")
+rowData(sc_data)
+
+# Metadatos
+cat("\n\nA continuación se muestran los metadatos del dataset:\n")
+metadata(sc_data)
+int_metadata(sc_data)
+```
 
 **¿Qué versión de la anotación de genes se usó?**
 Al analizar la procedencia del dataset, se pudo confirmar que se usó la Referencia Transcriptómica 
 Humana GRCh38, versión 2024-A.
 
 Esta versión está construida por 10x Genomics a partir de Ensembl 109, GENCODE v44 para humanos.
+
+```{r}
+# -------- PREGUNTA 4 | ¿Qué versión de la anotación de genes se usó?
+cat("\n -------- PREGUNTA 4 | ¿Qué versión de la anotación de genes se usó?----------\n")
+head(rowData(sc_data))
+
+cat("\nNotamos que la anotación proviene de Ensembl\n")
+cat("Buscando en la ruta del dataset, observamos la procedencia de los datos\n")
+
+texto <- readLines("/mnt/data/bioinfo3/compartido/10x/PROCEDENCIA.md")
+
+inicio <- grep("^## refdata", texto)
+fin <- grep("^## Verificación", texto)
+
+cat(texto[inicio:(fin - 1)], sep = "\n")
+```
 
 ```{r}
 #| label: importar
@@ -278,9 +389,15 @@ justificaciones vacías.
 
 ## Lo que no funcionó
 
-Un apartado corto y honesto. Qué intentaron que no salió, y qué aprendieron de
-ello. No resta puntos: un proyecto sin callejones sin salida normalmente es un
-proyecto que no exploró.
+Durante el desarrollo del proyecto nos enfrentamos con problemas solamente en la parte del filtrado ambiental, incluso al decidir usar SingleCellExperiment en lugar de Seurat los análisis se obtuvieron exitosamente.
+
+El problema del filtrado ambiental consiste en la obtención de un porcentaje de contaminación extremadamente alto de 66.7%, inclusive el programa reportaba esto como un evento raro y que se debían tomar medidas como realizar clustering o forzar a que se aceptaran los datos.
+
+No consideramos que este fuera el problema a encontrar en el dataset hasta que probaramos diferentes alternativas: cambiar la lista de genes, hacer clustering y utilizar una función que lo hace automáticamente.
+
+Al implementar las medidas
+
+Si bien presentó un punto de pánico durante el desarrollo del proyect
 
 ## Registro de sesión
 
