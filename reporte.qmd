@@ -476,13 +476,18 @@ justificaciones vacías.
 
 ## Lo que no funcionó
 
-Durante el desarrollo del proyecto nos enfrentamos con problemas solamente en la parte del filtrado ambiental, incluso al decidir usar SingleCellExperiment en lugar de Seurat los análisis se obtuvieron exitosamente.
+Durante el desarrollo del proyecto nos enfrentamos con problemas solamente en la parte del filtrado ambiental, incluso al decidir
+usar SingleCellExperiment en lugar de Seurat los análisis se obtuvieron exitosamente.
 
-El problema del filtrado ambiental consiste en la obtención de un porcentaje de contaminación extremadamente alto de 66.7%, inclusive el programa reportaba esto como un evento raro y que se debían tomar medidas como realizar clustering o forzar a que se aceptaran los datos.
+El problema del filtrado ambiental consiste en la obtención de un porcentaje de contaminación extremadamente alto de 66.7%, 
+inclusive el programa reportaba esto como un evento raro y que se debían tomar medidas como realizar clustering o forzar a que se aceptaran los datos.
 
-No consideramos que este fuera el problema a encontrar en el dataset hasta que probaramos diferentes alternativas: cambiar la lista de genes, hacer clustering y utilizar una función que lo hace automáticamente.
+No consideramos que este fuera el problema a encontrar en el dataset hasta que probaramos diferentes alternativas: cambiar la lista 
+de genes, hacer clustering y utilizar una función que lo hace automáticamente.
 
-Al implementar las medidas alternativas tuvimos problemas con el tiempo en el que corría el job con el Rscript, ya que teníamos puesto un límite de 4 horas en el método manual cambiando los genes y el job no terminó y lo cortó. El problema era que no estabamos haciendo clustering, lo cual agilizaba el tiempo que tomaba en correr.
+Al implementar las medidas alternativas tuvimos problemas con el tiempo en el que corría el job con el Rscript, ya que teníamos 
+puesto un límite de 4 horas en el método manual cambiando los genes y el job no terminó y lo cortó. El problema era que no estabamos 
+haciendo clustering, lo cual agilizaba el tiempo que tomaba en correr.
 
 Si bien presentó un punto de pánico durante el desarrollo del proyecto, se logró buscar soluciones para proseguir a la fase del QC.
 
