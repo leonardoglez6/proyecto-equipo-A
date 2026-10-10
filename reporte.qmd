@@ -405,9 +405,9 @@ El problema del filtrado ambiental consiste en la obtención de un porcentaje de
 
 No consideramos que este fuera el problema a encontrar en el dataset hasta que probaramos diferentes alternativas: cambiar la lista de genes, hacer clustering y utilizar una función que lo hace automáticamente.
 
-Al implementar las medidas
+Al implementar las medidas alternativas tuvimos problemas con el tiempo en el que corría el job con el Rscript, ya que teníamos puesto un límite de 4 horas en el método manual cambiando los genes y el job no terminó y lo cortó. El problema era que no estabamos haciendo clustering, lo cual agilizaba el tiempo que tomaba en correr.
 
-Si bien presentó un punto de pánico durante el desarrollo del proyect
+Si bien presentó un punto de pánico durante el desarrollo del proyecto, se logró buscar soluciones para proseguir a la fase del QC.
 
 ## Registro de sesión
 
