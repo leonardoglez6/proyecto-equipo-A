@@ -383,12 +383,56 @@ Para realizar el filtrado de los genes mitocondriales, se tuvieron que utilizar 
 de EmptyDrops y SoupX. Lo cual, al haber perdido las anotaciones, se tuvieron que recuperar para poder utilizar los 
 símbolos de los genes y poder filtrarlos correctamente (de lo contrario, usaría los IDs de Ensembl). 
 
+```{r}
+anotacion <- data.frame(ID = rownames(sc_data),
+                        Symbol = rowData(sc_data)$Symbol)
+
+# Guardar el ID y los Símbolos de los genes
+rowData(limpio)$ID     <- rownames(limpio)
+rowData(limpio)$Symbol <- anotacion$Symbol[match(rownames(limpio), anotacion$ID)]
+
+# Guardar simbolos del dataset para usarlos dentro del análisis
+simbolos <- rowData(limpio)$Symbol
+```
+
 Al analizar el dataset, se encontraron 13 genes mitocondriales. 
 
 También, se obtuvieron sus métricas del porcentaje de genes mitocondriales por célula. Con lo cual, se obtuvo una 
 mediana de 4.76% y una media de 8.70%, indicando una gran contaminación mitocondrial. 
 
 Las cuentas totales por células rondaron desde 49 hasta 60,903, con una mediana de 8957 y una media de 9729. 
+
+```{r}
+# ============= MITOCONDRIALES ==========
+cat("\n======= Filtrado Mitocondrial  =========")
+
+# Obtener lista de genes mitocondriales con prefijo MT
+mitocondriales <- grep("^MT-", simbolos)
+cat("\nGenes mitocondriales encontrados:", length(mitocondriales), "\n")
+cat(simbolos[mitocondriales], "\n")
+
+# Obtener lista de genes ribosomales con prefijo RP (se pone aquí para no sobreescribir después)
+ribosomales <- grep("^RP[SL][0-9]+[A-Z]?[0-9]*$|^RPLP[0-9]$|^RPSA$", simbolos)
+
+# Procesar datos mitocondriales y ribosomales
+sce <- addPerCellQCMetrics(limpio, subsets = list(MT = mitocondriales, RIBO = ribosomales))
+
+# Imprimir resultados
+cat("\nCuentas totales por célula: \n")
+summary(sce$sum)
+
+cat("\nMétricas de porcentaje de genes mitocondriales por célula: \n")
+summary(sce$subsets_MT_percent)
+cat("\n")
+
+# Cuentas totales
+plotColData(sce, y = "sum") +
+  scale_y_log10() + labs(y = "cuentas totales (log)")
+
+# Porcentaje mitocondrial
+plotColData(sce, y = "subsets_MT_percent") +
+  labs(y = "% mitocondrial")
+```
 
 Para filtrar los genes mitocondriales, se probaron 2 formas:
 
@@ -406,6 +450,29 @@ Los resultados fueron los siguientes:
 descartaron por umbrales basados en nuestros datos, como los de de librería bajo (menos de 3082 cuentas), pocos genes 
 detectados (menos de 1496 genes detectados) y porcentaje mitocondrial alto (mayor a 11.7%). 
 
+```{r}
+# Umbral con MAD adaptativo
+qc_mt <- perCellQCFilters(sce, sub.fields = "subsets_MT_percent")
+mad_mt <- qc_mt$discard
+
+cat(sprintf("\nMAD descarta %d células (%.1f%%)\n",
+            sum(mad_mt), 100 * mean(mad_mt)))
+
+umbrales <- data.frame(
+  metrica = c("cuentas totales (mín)", "genes detectados (mín)", "% mitocondrial (máx)"),
+  umbral  = c(attr(qc_mt$low_lib_size, "thresholds")[["lower"]],
+              attr(qc_mt$low_n_features, "thresholds")[["lower"]],
+              attr(qc_mt$high_subsets_MT_percent, "thresholds")[["higher"]]),
+  descartadas = colSums(as.matrix(qc_mt[, c("low_lib_size", "low_n_features",
+                                            "high_subsets_MT_percent")]))
+)
+print(umbrales)
+
+# Desarrollo de cada métrica
+cat("\nDesglose por métrica (MAD): \n")
+(colSums(as.matrix(qc_mt[, c("low_lib_size", "low_n_features", "high_subsets_MT_percent")]))
+```
+
 Finalmente, se decidió utilizar el filtrado realizado por MAD, debido a que es un filtro que se adapta a nuestros datos, 
 es decir, no es genérico o estándar. Además, el umbral estándar eliminaba muchas de nuestras células (47.8%), demostrando 
 no estar ajustado. Con este análisis, se logró encontrar uno de los mayores artefactos de nuestro dataset, el cual es la alta 
@@ -420,16 +487,44 @@ una media de 19.51%.
 
 Los cuales se pueden observar en la siguiente gráfica:
 
+```{r}
+# ============= RIBOSOMALES ==========
+cat("\n============ Filtrado Ribosomal ===========")
+
+cat("\nGenes ribosomales encontrados:", length(ribosomales), "\n")
+cat(simbolos[ribosomales], "\n")
+
+cat("\nMétricas de porcentaje de genes ribosomales por célula: \n")
+summary(sce$subsets_RIBO_percent)
+cat("\n")
+
+# Porcentaje ribosomal
+plotColData(sce, y = "subsets_RIBO_percent") +
+    labs(y = "% ribosomal")
+```
+
 También, se pueden comparar la relación entre las células y su porcentaje mitocondrial y ribosomal.
+
+```{r}
+# Relación MT vs RIBO
+plotColData(sce, x = "subsets_RIBO_percent", y = "subsets_MT_percent") +
+    labs(x = "% ribosomal", y = "% mitocondrial")
+```
 
 Podemos concluir que los porcentajes ribosomales se encuentran dentro de los límites normales dentro de una célula, ya que 
 normalmente se encuentran entre los rangos de 15 - 40% [https://kb.10xgenomics.com/s/article/218169723-What-fraction-of-reads-map-to-ribosomal-proteins]. 
 Además, no se encontraron valores atípicos fuera de los 3 MADs. Lo que nos llevó a decidir no hacer ningún filtrado por genes 
 ribosomales, ya que no lo consideramos necesario dentro de nuestros datos. 
 
+```{r}
+# Valores atípicos altos por MAD
+mad_ribo <- isOutlier(sce$subsets_RIBO_percent, type = "higher", nmads = 3)
+umbral_ribo <- attr(mad_ribo, "thresholds")["higher"]
 
-
-
+cat("\nUmbral ribosomal (mediana + 3 MAD):", round(umbral_ribo, 2), "%\n")
+cat("\nCélulas con % ribosomal atípicamente alto (MAD, 3 nmads): ",
+    sum(mad_ribo), " (", round(100 * sum(mad_ribo) / ncol(sce), 1), "%)\n", sep = "")
+```
 
 ### d) Filtrado de dobletes
 
@@ -448,8 +543,50 @@ Lo cual identificó a las células de la siguiente forma:
 Dentro de la siguiente gráfica, se pueden observar las células singlets y doublets con el umbral indicado:
 
 ```{r}
-#| label: qc
-#| eval: false
+# ======= DOBLETES ========
+set.seed(6)
+cat("\n=========== Filtrado Dobletes ===========")
+# Clasifica cada célula como singlet/doublet
+sce <- scDblFinder(sce)
+
+# Singlets y doublets encontrados en db
+cat("\nDobletes encontrados: \n")
+print(table(sce$scDblFinder.class))
+
+# Imprimir umbral que se eligió
+cat("\nUmbral escogido por scDblFinder:\n")
+print(metadata(sce)$scDblFinder.threshold)
+
+# Guardar imagen de células singlets y doublets
+plotColData(sce, x = "sum", y = "scDblFinder.score",
+            colour_by = "scDblFinder.class") +
+            scale_x_log10() + labs(x = "cuentas totales (log)", y = "puntuación")
+
+# Obtener objeto de dobletes
+dobletes = sce$scDblFinder.class == "doublet"
+```
+
+### e) Resultado Final tras filtrado
+
+Al final, de las 4085 células que se habían conservado de EmptyDrops. Se generó un dataset final con 2784 células tras el filtrado mitocondrial y de dobletes.
+
+```{r}
+# ===== FILTRADO FINAL =========
+cat("\n========= Filtrado Final ===========")
+# Descartar por MAD mitocondriales y dobletes
+sce$descartar <- mad_mt | dobletes
+
+cat("\nCélulas descartadas por criterio:\n")
+tab3 <- table(MAD_QC = mad_mt, doblete = dobletes)
+dimnames(tab3) <- lapply(dimnames(tab3),
+                        function(x) ifelse(x == "TRUE", "descarta", "conserva"))
+print(tab3)
+
+# Guardar dataset filtrado
+sce_filtrado <- sce[, !sce$descartar]
+
+# Imprimir resultados finales de células tras filtrado
+cat("\nAntes:", ncol(sce), "celulas | Después:", ncol(sce_filtrado), "\n")
 ```
 
 ## 3. Lo que encontraron
