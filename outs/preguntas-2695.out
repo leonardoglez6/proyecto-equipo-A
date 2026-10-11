@@ -1,0 +1,112 @@
+[1] "/mnt/data/bioinfo3/ysosa/proyecto-equipo-A/outs"
+
+
+A continuación se muestra la clase de nuestro objeto (dataset):
+[1] "SingleCellExperiment"
+attr(,"package")
+[1] "SingleCellExperiment"
+ -------- PREGUNTA 1 | Son cuentas crudas? Si hay decimales, no lo son. -------
+ Las cuentas son crudas.
+# -------- PREGUNTA 2 | ¿Las células ya están filtradas? --------
+Número de genes: 38606 
+Número de barcodes: 927681 
+¿Tiene métricas de QC por célula?: FALSE 
+Origen: pbmc_5k/outs/raw_feature_bc_matrix (corrida de la sesion 03) 
+
+Conclusión: Las células NO parecen estar filtradas.
+- El objeto contiene 927681 barcodes.
+- El objeto viene de 'raw_feature_bc_matrix'.
+- No contiene métricas de QC..
+
+
+# -------- PREGUNTA 3 | ¿Dónde están los metadatos de lote, donante y condición? --------
+
+                objeto genes celulas     suma  lote
+1 SingleCellExperiment 38606  927681 46048833 FALSE
+
+
+A continuación se muestran los metadatos de las células (columnas):
+DataFrame with 927681 rows and 0 columns
+DataFrame with 927681 rows and 3 columns
+       reducedDims     altExps    colPairs
+       <DataFrame> <DataFrame> <DataFrame>
+1                                         
+2                                         
+3                                         
+4                                         
+5                                         
+...            ...         ...         ...
+927677                                    
+927678                                    
+927679                                    
+927680                                    
+927681                                    
+
+
+A continuación se muestran los metadatos de los genes (filas):
+DataFrame with 38606 rows and 3 columns
+                             ID          Symbol            Type
+                    <character>     <character>     <character>
+ENSG00000290825 ENSG00000290825         DDX11L2 Gene Expression
+ENSG00000243485 ENSG00000243485     MIR1302-2HG Gene Expression
+ENSG00000237613 ENSG00000237613         FAM138A Gene Expression
+ENSG00000290826 ENSG00000290826 ENSG00000290826 Gene Expression
+ENSG00000186092 ENSG00000186092           OR4F5 Gene Expression
+...                         ...             ...             ...
+ENSG00000277836 ENSG00000277836 ENSG00000277836 Gene Expression
+ENSG00000278633 ENSG00000278633 ENSG00000278633 Gene Expression
+ENSG00000276017 ENSG00000276017 ENSG00000276017 Gene Expression
+ENSG00000278817 ENSG00000278817 ENSG00000278817 Gene Expression
+ENSG00000277196 ENSG00000277196 ENSG00000277196 Gene Expression
+
+
+A continuación se muestran los metadatos del dataset:
+$conjunto
+[1] "proyecto-2026"
+
+$equipo
+[1] "A"
+
+$derivado_de
+[1] "pbmc_5k/outs/raw_feature_bc_matrix (corrida de la sesion 03)"
+
+$origen
+[1] "10x Genomics · manual_5k_pbmc_NGSC3_ch5 · PBMC, un donante"
+
+$advertencia
+[1] "Conjunto DERIVADO con fines docentes. Se le inyectaron artefactos que NO ocurrieron en el laboratorio. Fiel en direccion y orden de magnitud, no en el detalle."
+
+$generado_por
+[1] "scripts/R/10-deriva-objetos-proyecto.R"
+
+$semilla
+[1] 20260903
+
+$generado_el
+[1] "2026-09-03"
+
+$version
+[1] ‘1.34.0’
+
+
+ -------- PREGUNTA 4 | ¿Qué versión de la anotación de genes se usó?----------
+DataFrame with 6 rows and 3 columns
+                             ID          Symbol            Type
+                    <character>     <character>     <character>
+ENSG00000290825 ENSG00000290825         DDX11L2 Gene Expression
+ENSG00000243485 ENSG00000243485     MIR1302-2HG Gene Expression
+ENSG00000237613 ENSG00000237613         FAM138A Gene Expression
+ENSG00000290826 ENSG00000290826 ENSG00000290826 Gene Expression
+ENSG00000186092 ENSG00000186092           OR4F5 Gene Expression
+ENSG00000238009 ENSG00000238009 ENSG00000238009 Gene Expression
+
+Notamos que la anotación proviene de Ensembl
+Buscando en la ruta del dataset, observamos la procedencia de los datos
+## refdata-gex-GRCh38-2024-A/
+
+Referencia transcriptómica humana GRCh38, versión 2024-A. 11.5 GB comprimida.
+
+https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2024-A.tar.gz
+
+URL pública, sin registro. Construida por 10x Genomics a partir de GENCODE.
+
