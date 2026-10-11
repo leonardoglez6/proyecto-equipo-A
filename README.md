@@ -34,6 +34,12 @@ excluye. Declara aquí de dónde salen.
 |---|---|---|
 | Dataset Equipo A | `/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto-equipo-A.rds` | [Peripheral blood mononuclear cells (PBMCs) from a healthy donor - Manual (channel 5) from 10X Genomics](https://www.10xgenomics.com/datasets/peripheral-blood-mononuclear-cells-pbm-cs-from-a-healthy-donor-manual-channel-5-3-1-standard-3-1-0) |
 
+### Cosas a considerar antes de reproducir el análisis
+* El renderizado se realizó en una computadora con versión de R 4.5.2, por lo que los resultados podrían diferir minimamente.
+* Para utilizarlo dentro de una computadora personal, se debe cambiar la ruta inicial `RUTA_DATOS` para ajustarse al equipo personal. 
+* Además en los archivos .sh dentro de la carpeta R/, se debe modificar la ruta a la cual deben ir los outlogs según corresponda a la ruta en la que se hayan descargado este repositorio. Fuera de ello, nada más se debe cambiar.
+* En el código `SCRIPT_COMPLETO.sh` se integraron todos los códigos en el orden correcto para mayor facilidad para los usuarios. 
+
 ### ¿Cómo se corrieron los códigos en orden?
 
 1. El código `preguntas.R` ayuda a contestar las 4 preguntas iniciales para poder entender el conjunto de datos.
