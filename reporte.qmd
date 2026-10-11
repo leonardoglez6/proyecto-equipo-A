@@ -72,7 +72,7 @@ suppressPackageStartupMessages({
 })
 
 # Se necesita cargar otra dirección donde se encuentran librerías necesarias, pero,
-no disponibles en donde se guardan las librerías para el cluster en general
+# no disponibles en donde se guardan las librerías para el cluster en general
 .libPaths(c(lib_extra, .libPaths()))
 suppressPackageStartupMessages({
   library(biomaRt)
