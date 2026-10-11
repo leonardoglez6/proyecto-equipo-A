@@ -612,6 +612,37 @@ cat("\nAntes:", ncol(sce), "celulas | Después:", ncol(sce_filtrado), "\n")
 
 Aquí va la interpretación biológica, no la descripción de lo que hizo el código.
 
+Nuestro dataset proviene de PBMC, lo cual significa que son Células mononucleares de sangre periférica. Esta población es heterogénea 
+e incluye linfocitos (células T, células B, y células Natural Killers), Monocitos (glóbulos blancos) y células dendríticas. Se aislaron 
+a partir de una muestra de sangre completa de un paciente sano. 
+
+La matriz de cuentas son crudas, lo que significa que no se han filtrado por gotas que podrían estar vacías. Esto es algo muy común dentro 
+de Single-Cell debido a la baja eficiencia de captura del ARNm. La interpretación que se le va a dar se basa en análisis hechos en base 
+a la Referencia Transcriptómica Humana GRCh38, versión 2024-A.
+
+Al realizar el primer filtrado de las gotas vacías, se obtuvieron 4085 células. Este resultado surge de una técnica de etiquetado por gota, 
+de la tecnología Chromium Single Cell 3ʹ Reagent Kits v3.1, como se puede ver en el origen de los datos 
+[https://www.10xgenomics.com/datasets/peripheral-blood-mononuclear-cells-pbm-cs-from-a-healthy-donor-manual-channel-5-3-1-standard-3-1-0]. 
+Esto es congruente debido a que sabemos que con esta tecnología se pueden secuenciar de miles a decenas de miles de células. Y, la tecnología 
+de 3' permite una captura a bajo costo, en comparación a una longitud completa. 
+
+Cuando realizamos el filtrado del ambiente, nos dimos cuenta que no se debían de utilizar los genes de hemoglobina únicamente, debido a que 
+estas células ya están filtradas de eritrocitos. Por lo tanto, se debe utilizar también un filtrado con inmunoglobulinas, ya que los linfocitos 
+componen la mayor parte del tejido de PBMC. En general, como no hay eritrocitos, no ocurren tantas lisis celulares, haciendo que el nivel de 
+contaminación ambiental sea bajo.
+
+Para realizar el filtrado mitocondrial, se vio una distribución de porcentaje de RNA mitocondrial muy elevada, lo cual se pudo confirmar con el MAD. 
+La biología de esta sobrerrepresentación de los genes mitocondriales podría indicarnos que hay muchas células muriendo, las cuales expresan estos 
+genes al estar en el proceso de apoptosis. Nuestro dataset se redujo en aproximadamente 1/4 de su longitud, lo que indica mucha contaminación mitocondrial 
+y una posible disminución en el poder estadístico de nuestros datos para análisis futuros. 
+
+Por otro lado, el filtrado ribosomal no indicó números fuera de los rangos esperados. Dentro de los datos, se esperan porcentajes aproximados 
+del 15-40% de RNA ribosomal. Porcentajes muy altos podrían indicar respuestas de estrés que cambiara la síntesis, y porcentajes bajos podría 
+indicar problemas en la preparación de la librería. [https://unobio.com/blog/single-cell-rna-seq-processing-metrics]
+
+Finalmente, se analizaron los dobletes, gotas que tenían 2 células en lugar de 1. Esto es identificable si se mezclan perfiles de células 
+diferentes, por lo que si se mantuvieran podrían afectar el análisis al estar juntándolas de manera incorrecta. 
+
 
 ## Tabla de decisiones
 
