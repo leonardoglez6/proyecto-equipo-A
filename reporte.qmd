@@ -23,6 +23,9 @@ engine: knitr
 
 ## Antes de empezar
 
+El renderizado se realizó en una computadora con versión de R 4.5.2, por lo que los resultados podrían diferir minimamente.
+Para utilizarlo dentro de una computadora personal, se debe cambiar la ruta inicial `RUTA_DATOS` para ajustarse al equipo personal. Fuera de ello, nada más se debe cambiar. 
+
 ::: {.callout-important}
 ## Este reporte tiene que correr desde cero
 
@@ -90,7 +93,7 @@ suppressPackageStartupMessages({
 set.seed(6)
 
 # -------- Cargar datos -------
-sce <- readRDS("/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto-equipo-A.rds")
+sce <- readRDS(RUTA_DATOS)
 ```
 
 **1. ¿Son cuentas crudas o ya están normalizadas?**
