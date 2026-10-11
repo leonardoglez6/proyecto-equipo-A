@@ -23,10 +23,11 @@ engine: knitr
 
 ## Antes de empezar
 
-El renderizado se realizó en una computadora con versión de R 4.5.2, por lo que los resultados podrían diferir minimamente.
-Para utilizarlo dentro de una computadora personal, se debe cambiar la ruta inicial `RUTA_DATOS` para ajustarse al equipo personal. 
-Además en los archivos .sh dentro de la carpeta R/, se debe modificar la ruta a la cual deben ir los outlogs según correspoinda a 
+* El renderizado se realizó en una computadora con versión de R 4.5.2, por lo que los resultados podrían diferir minimamente.
+* Para utilizarlo dentro de una computadora personal, se debe cambiar la ruta inicial `RUTA_DATOS` para ajustarse al equipo personal. 
+* Además en los archivos .sh dentro de la carpeta R/, se debe modificar la ruta a la cual deben ir los outlogs según correspoinda a 
 la ruta en la que se hayan descargado este repositorio. Fuera de ello, nada más se debe cambiar.
+* En el código `SCRIPT_COMPLETO.sh` se integraron todos los códigos en el orden correcto para mayor facilidad para los usuarios. 
 
 ::: {.callout-important}
 ## Este reporte tiene que correr desde cero
