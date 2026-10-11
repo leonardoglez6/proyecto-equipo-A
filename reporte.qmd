@@ -243,7 +243,7 @@ head(rowData(sce))
 cat("\nNotamos que la anotación proviene de Ensembl\n")
 cat("Buscando en la ruta del dataset, observamos la procedencia de los datos\n")
 
-texto <- readLines("/mnt/data/bioinfo3/compartido/10x/PROCEDENCIA.md")
+texto <- readLines("PROCEDENCIA.md")
 
 inicio <- grep("^## refdata", texto)
 fin <- grep("^## Verificación", texto)
@@ -265,6 +265,10 @@ Primero, realizamos la curva de rango para observar los datos del experimento.
 # -------- Crear la curva de rango --------
 totales <- colSums(counts(sce))
 br <- barcodeRanks(counts(sce))
+orden_br <- order(br$rank)
+knee       <- metadata(br)$knee
+inflection <- metadata(br)$inflection
+
 plot(br$rank[orden_br], br$total[orden_br], log = "xy",
      xlab = "Rango del código de barras", ylab = "Total de cuentas",
      main = "Curva de rango", type = "l", lwd = 2)
@@ -384,12 +388,9 @@ de EmptyDrops y SoupX. Lo cual, al haber perdido las anotaciones, se tuvieron qu
 símbolos de los genes y poder filtrarlos correctamente (de lo contrario, usaría los IDs de Ensembl). 
 
 ```{r}
-anotacion <- data.frame(ID = rownames(sc_data),
-                        Symbol = rowData(sc_data)$Symbol)
-
-# Guardar el ID y los Símbolos de los genes
-rowData(limpio)$ID     <- rownames(limpio)
-rowData(limpio)$Symbol <- anotacion$Symbol[match(rownames(limpio), anotacion$ID)]
+# Envolver en SCE y recuperar anotaciones del sce original
+limpio <- SingleCellExperiment(assays = list(counts = limpio))
+rowData(limpio) <- rowData(sce)[rownames(limpio), ]   # ID, Symbol, Type
 
 # Guardar simbolos del dataset para usarlos dentro del análisis
 simbolos <- rowData(limpio)$Symbol
@@ -470,7 +471,7 @@ print(umbrales)
 
 # Desarrollo de cada métrica
 cat("\nDesglose por métrica (MAD): \n")
-(colSums(as.matrix(qc_mt[, c("low_lib_size", "low_n_features", "high_subsets_MT_percent")]))
+colSums(as.matrix(qc_mt[, c("low_lib_size", "low_n_features", "high_subsets_MT_percent")]))
 ```
 
 Finalmente, se decidió utilizar el filtrado realizado por MAD, debido a que es un filtro que se adapta a nuestros datos, 
