@@ -100,6 +100,7 @@ la matriz de cuentas redondeada a que no tenga decimales. El análisis indicó q
 iguales, por lo que se componía de una matriz de cuentas crudas (números enteros solamente).
 
 ```{r}
+set.seed(6)
 # -------- PREGUNTA 1 | Son cuentas crudas? Si hay decimales, no lo son. -------
 cat(" -------- PREGUNTA 1 | Son cuentas crudas? Si hay decimales, no lo son. -------")
 
@@ -128,6 +129,7 @@ Se considera que la matriz es 'raw'. Esto por diferentes razones:
 
 
 ```{r}
+set.seed(6)
 # -------- PREGUNTA 2 | ¿Las células ya están filtradas? --------
 cat("# -------- PREGUNTA 2 | ¿Las células ya están filtradas? --------\n")
 
@@ -196,6 +198,7 @@ los FASTQs es de 16.3 B como se especificaba en el archivo de `PROCEDENCIA.md` y
 Cell Ranger 3.1.0 debajo del título.
 
 ```{r}
+set.seed(6)
 # -------- PREGUNTA 3 | ¿Dónde están los metadatos de lote, donante y condición? --------
 cat("# -------- PREGUNTA 3 | ¿Dónde están los metadatos de lote, donante y condición? --------")
 
@@ -236,6 +239,7 @@ Humana GRCh38, versión 2024-A.
 Esta versión está construida por 10x Genomics a partir de Ensembl 109, GENCODE v44 para humanos.
 
 ```{r}
+set.seed(6)
 # -------- PREGUNTA 4 | ¿Qué versión de la anotación de genes se usó?
 cat("\n -------- PREGUNTA 4 | ¿Qué versión de la anotación de genes se usó?----------\n")
 head(rowData(sce))
@@ -262,6 +266,7 @@ penaliza.
 Primero, realizamos la curva de rango para observar los datos del experimento. 
 
 ```{r}
+set.seed(6)
 # -------- Crear la curva de rango --------
 totales <- colSums(counts(sce))
 br <- barcodeRanks(counts(sce))
@@ -293,6 +298,7 @@ Usar emptyDrops es más conveniente, ya que al ser una prueba estadística que a
 hipótesis nula que la gota es del perfil ambiental, se estima mejor su contenido. 
 
 ```{r}
+set.seed(6)
 # -------- Utilizar EmptyDrops --------
 emptyD <- emptyDrops(counts(sce), lower = 50, niters = 10000)
 llamadas_emptyD <- !is.na(emptyD$FDR) & emptyD$FDR <= 0.001
@@ -348,6 +354,7 @@ encuentra muy sesgada hacia valores bajos de rho, lo cual es un muy buen indicat
 RNA ambiental de nuestros datos ya que rho es la fracción de cuentas de cada célula que viene del RNA ambiental.
 
 ```{r}
+set.seed(6)
 # ========== Filtrado Ambiental ============
 # Ver perfil del ambiente
 soup_channel <- SoupChannel(tod = counts(sce), toc = counts(sce_ED))
@@ -388,6 +395,7 @@ de EmptyDrops y SoupX. Lo cual, al haber perdido las anotaciones, se tuvieron qu
 símbolos de los genes y poder filtrarlos correctamente (de lo contrario, usaría los IDs de Ensembl). 
 
 ```{r}
+set.seed(6)
 # Envolver en SCE y recuperar anotaciones del sce original
 limpio <- SingleCellExperiment(assays = list(counts = limpio))
 rowData(limpio) <- rowData(sce)[rownames(limpio), ]   # ID, Symbol, Type
@@ -404,6 +412,7 @@ mediana de 4.76% y una media de 8.70%, indicando una gran contaminación mitocon
 Las cuentas totales por células rondaron desde 49 hasta 60,903, con una mediana de 8957 y una media de 9729. 
 
 ```{r}
+set.seed(6)
 # ============= MITOCONDRIALES ==========
 cat("\n======= Filtrado Mitocondrial  =========")
 
@@ -452,6 +461,7 @@ descartaron por umbrales basados en nuestros datos, como los de de librería baj
 detectados (menos de 1496 genes detectados) y porcentaje mitocondrial alto (mayor a 11.7%). 
 
 ```{r}
+set.seed(6)
 # Umbral con MAD adaptativo
 qc_mt <- perCellQCFilters(sce, sub.fields = "subsets_MT_percent")
 mad_mt <- qc_mt$discard
@@ -489,6 +499,7 @@ una media de 19.51%.
 Los cuales se pueden observar en la siguiente gráfica:
 
 ```{r}
+set.seed(6)
 # ============= RIBOSOMALES ==========
 cat("\n============ Filtrado Ribosomal ===========")
 
@@ -507,6 +518,7 @@ plotColData(sce, y = "subsets_RIBO_percent") +
 También, se pueden comparar la relación entre las células y su porcentaje mitocondrial y ribosomal.
 
 ```{r}
+set.seed(6)
 # Relación MT vs RIBO
 plotColData(sce, x = "subsets_RIBO_percent", y = "subsets_MT_percent") +
     labs(x = "% ribosomal", y = "% mitocondrial")
@@ -518,6 +530,7 @@ Además, no se encontraron valores atípicos fuera de los 3 MADs. Lo que nos lle
 ribosomales, ya que no lo consideramos necesario dentro de nuestros datos. 
 
 ```{r}
+set.seed(6)
 # Valores atípicos altos por MAD
 mad_ribo <- isOutlier(sce$subsets_RIBO_percent, type = "higher", nmads = 3)
 umbral_ribo <- attr(mad_ribo, "thresholds")["higher"]
@@ -544,6 +557,7 @@ Lo cual identificó a las células de la siguiente forma:
 Dentro de la siguiente gráfica, se pueden observar las células singlets y doublets con el umbral indicado:
 
 ```{r}
+set.seed(6)
 # ======= DOBLETES ========
 set.seed(6)
 cat("\n=========== Filtrado Dobletes ===========")
@@ -572,6 +586,7 @@ dobletes = sce$scDblFinder.class == "doublet"
 Al final, de las 4085 células que se habían conservado de EmptyDrops. Se generó un dataset final con 2784 células tras el filtrado mitocondrial y de dobletes.
 
 ```{r}
+set.seed(6)
 # ===== FILTRADO FINAL =========
 cat("\n========= Filtrado Final ===========")
 # Descartar por MAD mitocondriales y dobletes
