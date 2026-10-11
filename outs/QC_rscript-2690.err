@@ -1,0 +1,26 @@
+Warning messages:
+1: In addPerCellQCMetrics(sce, subsets = list(MT = mitocondriales,  :
+  'addPerCellQCMetrics' is deprecated.
+Use 'scrapper::quickRnaQc.se' instead.
+See help("Deprecated")
+2: In .per_cell_qc_metrics(assay(x, assay.type), subsets = subsets,  :
+  'perCellQCMetrics' is deprecated.
+Use 'scrapper::computeRnaQcMetrics' instead.
+See help("Deprecated")
+Warning message:
+In perCellQCFilters(sce, sub.fields = "subsets_MT_percent") :
+  'perCellQCFilters' is deprecated.
+Use 'scrapper::suggestRnaQcThresholds' instead.
+See help("Deprecated")
+Creating ~3268 artificial doublets...
+Dimensional reduction
+Evaluating kNN...
+Training model...
+iter=0, 577 cells excluded from training.
+iter=1, 589 cells excluded from training.
+iter=2, 566 cells excluded from training.
+Threshold found:0.379
+252 (6.2%) doublets called
+Warning message:
+In .checkSCE(sce, coerce = is.null(samples)) :
+  Some cells in `sce` have an extremely low read counts; note that these could trigger errors and might best be filtered out

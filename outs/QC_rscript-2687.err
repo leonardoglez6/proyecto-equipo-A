@@ -1,0 +1,13 @@
+Warning messages:
+1: In addPerCellQCMetrics(sce, subsets = list(MT = mitocondriales,  :
+  'addPerCellQCMetrics' is deprecated.
+Use 'scrapper::quickRnaQc.se' instead.
+See help("Deprecated")
+2: In .per_cell_qc_metrics(assay(x, assay.type), subsets = subsets,  :
+  'perCellQCMetrics' is deprecated.
+Use 'scrapper::computeRnaQcMetrics' instead.
+See help("Deprecated")
+Error in grid.newpage() : 
+  could not open file '../figuras/MT_cuentas_totales.png'
+Calls: print -> print.ggplot2::ggplot -> grid.newpage
+Execution halted

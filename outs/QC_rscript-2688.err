@@ -1,0 +1,18 @@
+Warning messages:
+1: In addPerCellQCMetrics(sce, subsets = list(MT = mitocondriales,  :
+  'addPerCellQCMetrics' is deprecated.
+Use 'scrapper::quickRnaQc.se' instead.
+See help("Deprecated")
+2: In .per_cell_qc_metrics(assay(x, assay.type), subsets = subsets,  :
+  'perCellQCMetrics' is deprecated.
+Use 'scrapper::computeRnaQcMetrics' instead.
+See help("Deprecated")
+Warning message:
+In perCellQCFilters(sce, sub.fields = "subsets_MT_percent") :
+  'perCellQCFilters' is deprecated.
+Use 'scrapper::suggestRnaQcThresholds' instead.
+See help("Deprecated")
+Error in attr(qc_mt$low_lib_size, "thresholds")["lower", ] : 
+  incorrect number of dimensions
+Calls: data.frame
+Execution halted

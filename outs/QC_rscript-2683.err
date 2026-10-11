@@ -1,0 +1,17 @@
+Warning messages:
+1: In addPerCellQCMetrics(sce, subsets = list(MT = mitocondriales,  :
+  'addPerCellQCMetrics' is deprecated.
+Use 'scrapper::quickRnaQc.se' instead.
+See help("Deprecated")
+2: In .per_cell_qc_metrics(assay(x, assay.type), subsets = subsets,  :
+  'perCellQCMetrics' is deprecated.
+Use 'scrapper::computeRnaQcMetrics' instead.
+See help("Deprecated")
+Warning message:
+In perCellQCFilters(sce, sub.fields = "subsets_MT_percent") :
+  'perCellQCFilters' is deprecated.
+Use 'scrapper::suggestRnaQcThresholds' instead.
+See help("Deprecated")
+Creating ~3268 artificial doublets...
+Dimensional reduction
+[2026-10-10T14:51:21.134] error: *** JOB 2683 ON node01 CANCELLED AT 2026-10-10T14:51:21 DUE to SIGNAL Terminated ***

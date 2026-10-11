@@ -51,7 +51,7 @@ suppressPackageStartupMessages({
 # -------- Cargar datos -------
 
 sce <- readRDS("/mnt/data/bioinfo3/compartido/10x/datasets/proyecto-2026/proyecto-equipo-A.rds")
-figures <- "/mnt/data/bioinfo3/ysosa/proyecto-equipo-A/figuras"
+figures <- "../figuras"
 
 set.seed(6)
 
@@ -65,7 +65,7 @@ c(codo = knee, inflexion = inflection)
 
 orden_br <- order(br$rank)
 
-# png(file.path(figures, "Curva_de_rango.png"), width = 1600, height = 1200, res = 300, type = "cairo")
+png(file.path(figures, "Curva_de_rango.png"), width = 1600, height = 1200, res = 300, type = "cairo")
 plot(br$rank[orden_br], br$total[orden_br], log = "xy",
      xlab = "Rango del código de barras", ylab = "Total de cuentas",
      main = "Curva de rango", type = "l", lwd = 2)
@@ -138,4 +138,3 @@ head(limpio_50_auto)
 # =========== Guardar el dataset final ==========
 dir_salida <- "../datos"
 saveRDS(limpio_50_auto, file.path(dir_salida, "sce_limpio_50_auto.rds"))
-

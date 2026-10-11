@@ -1,0 +1,23 @@
+[1] "/mnt/data/bioinfo3/ysosa/proyecto-equipo-A/outs"
+
+
+=========== Preparación de los datos ===============
+Clase del objeto: dgCMatrix 
+Dimensiones: 38606 4085 
+[1] "ENSG00000290825" "ENSG00000243485" "ENSG00000237613" "ENSG00000290826"
+[5] "ENSG00000186092" "ENSG00000238009"
+
+Genes sin símbolo: 0 de 38606 
+
+======= Filtrado Mitocondrial  =========
+Genes mitocondriales encontrados: 13 
+MT-ND1 MT-ND2 MT-CO1 MT-CO2 MT-ATP8 MT-ATP6 MT-CO3 MT-ND3 MT-ND4L MT-ND4 MT-ND5 MT-ND6 MT-CYB 
+
+Cuentas totales por célula: 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+     49    7055    8957    9729   11396   60903 
+
+Métricas de porcentaje de genes mitocondriales por célula: 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   3.511   4.762   8.706   8.450  98.570 
+
